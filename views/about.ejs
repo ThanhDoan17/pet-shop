@@ -1,0 +1,325 @@
+<%- include('partials/header') %>
+
+<style>
+/* ĐỒNG BỘ MÀU SẮC CHỦ ĐẠO & HỆ THỐNG PHÔNG CHỮ */
+:root {
+  --amazon-orange: #ff9900;
+  --amazon-dark: #131921;
+  --text-dark: #1a1a1a;
+  --bg-light: #f8f9fa;
+  --border-color: #e5e7eb;
+}
+
+.about-page-container {
+  background-color: #ffffff;
+  color: var(--text-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  padding-bottom: 80px;
+}
+
+/* KHỐI TIÊU ĐỀ TRANG CHỦ ĐẠO (AMAZON NEWS STYLE) */
+.news-brand-header {
+  border-bottom: 1px solid var(--border-color);
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+.news-brand-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+}
+.news-brand-title span {
+  color: var(--amazon-orange);
+}
+
+/* LƯỚI SHOWCASE TIÊU ĐIỂM (GRID 2 CỘT LỚN) */
+.showcase-main-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+/* KHỐI BANNER CHÍNH BÊN TRÁI (HERO BANNER) */
+.hero-news-banner {
+  cursor: pointer;
+}
+.hero-news-image-box {
+  width: 100%;
+  height: 420px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  background-color: #eee;
+}
+.hero-news-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.hero-news-banner:hover .hero-news-image-box img {
+  transform: scale(1.02);
+}
+.hero-news-title {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  color: var(--text-dark);
+}
+.hero-news-desc {
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+/* KHỐI TIN PHỤ BÊN PHẢI (SIDEBAR CARDS) */
+.sidebar-news-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+.side-news-card {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
+}
+.side-news-card:last-child {
+  border-bottom: none;
+}
+.side-image-box {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.side-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.side-news-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+.side-news-date {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* KHỐI DANH MỤC ĐỔI MỚI & SÁNG TẠO (INNOVATION AND AI GRID) */
+.section-divider-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  border-bottom: 2px solid var(--text-dark);
+  padding-bottom: 10px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-divider-title a {
+  font-size: 0.9rem;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.innovation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.innovation-card {
+  display: flex;
+  flex-direction: column;
+}
+.innovation-image-box {
+  width: 100%;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  background-color: #eee;
+}
+.innovation-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.innovation-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+  height: 4.2rem;
+}
+.innovation-card-date {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: auto;
+}
+
+/* CẤU TRÚC ĐÁNH GIÁ SỐ LIỆU THỐNG KÊ RÚT GỌN */
+.stats-strip-wrapper {
+  background-color: var(--bg-light);
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 50px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+.stat-item-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--amazon-orange);
+}
+.stat-item-label {
+  font-size: 0.9rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+/* ĐÁP ỨNG GIAO DIỆN DI ĐỘNG (RESPONSIVE) */
+@media (max-width: 992px) {
+  .showcase-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .innovation-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 576px) {
+  .innovation-grid {
+    grid-template-columns: 1fr;
+  }
+  .stats-strip-wrapper {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .hero-news-image-box {
+    height: 260px;
+  }
+}
+</style>
+
+<div class="about-page-container">
+  <div class="container">
+    
+    <!-- BRAND TIN TỨC CHỦ ĐẠO -->
+    <header class="news-brand-header">
+      <h2 class="news-brand-title">PESTshop <span>News & Stories</span></h2>
+    </header>
+
+    <!-- KHỐI HIỂN THỊ TIÊU ĐIỂM CHÍNH (SHOWCASE GRID) -->
+    <div class="showcase-main-grid">
+      
+      <article class="hero-news-banner">
+        <div class="hero-news-image-box">
+          <img src="/picture/10.jpg" alt="PESTshop Hỏa Tốc">
+        </div>
+        <h3 class="hero-news-title">PESTshop chính thức vận hành dịch vụ giao hàng siêu tốc 30 phút trong nội thành</h3>
+        <p class="hero-news-desc">Nhằm tối ưu trải nghiệm chăm sóc thú cưng, hệ thống giao hàng hỏa tốc hiện tại đã khả dụng cho hàng nghìn mặt hàng nhu yếu phẩm, thức ăn tươi và phụ kiện y tế khẩn cấp, giúp hỗ trợ tối đa cho các chủ nuôi bận rộn.</p>
+      </article>
+
+      <!-- Cột phải: Tin tức phụ xếp dọc -->
+      <aside class="sidebar-news-stack">
+        
+        <div class="side-news-card">
+          <div class="side-image-box">
+            <img src="/picture/11.jpg" alt="Thủy sinh đẳng cấp">
+          </div>
+          <h4 class="side-news-title">Tất tần tật những điều cần biết để tự thiết kế một hệ thống bể thủy sinh chuẩn tự nhiên tại nhà</h4>
+          <span class="side-news-date">Ngày 14 tháng 5, 2026</span>
+        </div>
+
+        <div class="side-news-card">
+          <h4 class="side-news-title" style="font-size: 1.05rem; margin-top: 5px;">10 Thuật ngữ y tế và Vitamin thiết yếu cho thú cưng mùa nắng nóng bạn bắt buộc phải lưu ý</h4>
+          <span class="side-news-date">Ngày 12 tháng 5, 2026</span>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- KHỐI DÒNG BÀI VIẾT: ĐỔI MỚI & SÁNG TẠO (INNOVATION AND AI GRID) -->
+    <section class="innovation-section">
+      
+      <div class="section-divider-title">
+        <span>Hành trình Đổi mới & Phát triển</span>
+        <a href="/products">Xem tất cả bài viết <i class="bi bi-arrow-right-short"></i></a>
+      </div>
+
+      <div class="innovation-grid">
+        
+        <!-- Thẻ bài viết 1 -->
+        <div class="innovation-card">
+          <div class="innovation-image-box">
+            <img src="/picture/12.jpg" alt="Doanh thu phát triển">
+          </div>
+          <h5 class="innovation-card-title">Báo cáo doanh thu quý I: Lượng khách hàng lựa chọn giải pháp dinh dưỡng hữu cơ tăng vọt</h5>
+          <span class="innovation-card-date">29 Tháng 4, 2026</span>
+        </div>
+
+        <!-- Thẻ bài viết 2 -->
+        <div class="innovation-card">
+          <div class="innovation-image-box">
+            <img src="/picture/13.jpg" alt="Lồng Hamster cao cấp">
+          </div>
+          <h5 class="innovation-card-title">7 Tính năng vượt trội trên dòng sản phẩm Lồng Hamster thông minh thế hệ mới tích hợp hệ thống dọn kho tự động</h5>
+          <span class="innovation-card-date">28 Tháng 4, 2026</span>
+        </div>
+
+        <!-- Thẻ bài viết 3 -->
+        <div class="innovation-card">
+          <div class="innovation-image-box">
+            <img src="/picture/14.jpg" alt="Hệ thống quản trị dữ liệu">
+          </div>
+          <h5 class="innovation-card-title">PESTshop ra mắt Trợ lý AI tư vấn sức khỏe thú cưng trực tuyến ngay trên nền tảng ứng dụng web</h5>
+          <span class="innovation-card-date">28 Tháng 4, 2026</span>
+        </div>
+
+        <!-- Thẻ bài viết 4 -->
+        <div class="innovation-card">
+          <div class="innovation-image-box">
+            <img src="/picture/15.jpg" alt="Hoạt động cộng đồng">
+          </div>
+          <h5 class="innovation-card-title">Chiến dịch PESTshop sẻ chia: Hơn 100.000 học sinh, sinh viên tham gia chương trình giáo dục bảo vệ động vật nhỏ</h5>
+          <span class="innovation-card-date">11 Tháng 4, 2026</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- KHỐI SỐ LIỆU THỐNG KÊ ĐỒNG BỘ DỰ ÁN CỦA BẠN -->
+    <div class="stats-strip-wrapper">
+      <div class="stat-item-box">
+        <div class="stat-item-number">4+ Năm</div>
+        <div class="stat-item-label">Kinh nghiệm đồng hành</div>
+      </div>
+      <div class="stat-item-box">
+        <div class="stat-item-number">5K+</div>
+        <div class="stat-item-label">Khách hàng trao gửi niềm tin</div>
+      </div>
+      <div class="stat-item-box">
+        <div class="stat-item-number">500+</div>
+        <div class="stat-item-label">Sản phẩm phân phối chính hãng</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,72 @@
+<%- include('../partials/header') %>
+<div class="container py-4">
+  <h2 class="section-title"><i class="bi bi-boxes"></i> Quản lý tồn kho</h2>
+
+  <div class="mb-3">
+    <a href="/staff/orders" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bag"></i> Đơn hàng</a>
+    <a href="/staff/products/add" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</a>
+  </div>
+
+  <form method="GET" action="/staff/inventory" class="mb-3">
+  <div class="row g-2" style="max-width:650px">
+    <div class="col">
+      <input type="text" name="search" value="<%= search %>" class="form-control" placeholder="🔍 Tìm sản phẩm...">
+    </div>
+    <div class="col-auto">
+      <select name="sort" class="form-select">
+        <option value="" <%= sort === '' ? 'selected' : '' %>>Mặc định</option>
+        <option value="stock-asc" <%= sort === 'stock-asc' ? 'selected' : '' %>>Tồn kho tăng dần</option>
+        <option value="stock-desc" <%= sort === 'stock-desc' ? 'selected' : '' %>>Tồn kho giảm dần</option>
+        <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Tên A-Z</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary">Tìm</button>
+      <% if (search || sort) { %><a href="/staff/inventory" class="btn btn-outline-secondary">Xóa</a><% } %>
+    </div>
+  </div>
+</form>
+
+  <div class="bg-white rounded-3 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th>Danh mục</th>
+            <th>Tồn kho</th>
+            <th>Cập nhật tồn kho</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% products.forEach(p => { %>
+          <tr>
+            <td><img src="<%= p.image %>" width="50" height="50" style="object-fit:contain;" class="rounded"></td>
+            <td class="fw-bold"><%= p.name %></td>
+            <td><span class="badge bg-secondary"><%= p.category %></span></td>
+            <td>
+              <span class="badge <%= p.stock > 10 ? 'bg-success' : p.stock > 0 ? 'bg-warning text-dark' : 'bg-danger' %> fs-6"><%= p.stock %></span>
+              <% if (p.stock === 0) { %><small class="text-danger ms-1">Hết hàng!</small><% } %>
+              <% if (p.stock > 0 && p.stock <= 5) { %><small class="text-warning ms-1">Sắp hết!</small><% } %>
+            </td>
+            <td>
+              <form method="POST" action="/staff/inventory/<%= p._id %>/stock" class="d-flex gap-2">
+                <input type="number" name="stock" value="<%= p.stock %>" min="0" class="form-control form-control-sm" style="width:80px">
+                <button class="btn btn-sm btn-primary">Lưu</button>
+              </form>
+            </td>
+            <td>
+              <a href="/staff/products/edit/<%= p._id %>" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i> Sửa
+              </a>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

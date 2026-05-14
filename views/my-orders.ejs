@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+<div class="container py-4">
+  <h2 class="section-title"><i class="bi bi-bag"></i> Đơn hàng của tôi</h2>
+  <% if (orders.length === 0) { %>
+    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+      <div class="fs-1">📦</div>
+      <h4 class="text-muted mt-3">Chưa có đơn hàng nào</h4>
+      <a href="/products" class="btn btn-primary mt-3">Mua sắm ngay</a>
+    </div>
+  <% } else { %>
+    <div class="bg-white rounded-3 shadow-sm">
+      <% orders.forEach(o => { %>
+      <div class="p-4 border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-bold">#<%= o._id.toString().slice(-6).toUpperCase() %></span>
+            <span class="text-muted ms-3 small"><%= o.createdAt.toLocaleDateString('vi-VN') %></span>
+          </div>
+          <div>
+            <span class="badge bg-<%= o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning text-dark' %>">
+              <%= o.status === 'pending' ? 'Chờ xử lý' : o.status === 'confirmed' ? 'Đã xác nhận' : o.status === 'shipping' ? 'Đang giao' : o.status === 'delivered' ? 'Đã giao' : 'Đã hủy' %>
+            </span>
+          </div>
+        </div>
+        <div class="mt-2 text-warning fw-bold"><%= o.totalPrice.toLocaleString('vi-VN') %> đ</div>
+      </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

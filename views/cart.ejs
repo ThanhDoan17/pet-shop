@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+<div class="container py-4">
+  <h2 class="section-title"><i class="bi bi-cart3"></i> Giỏ hàng</h2>
+  <% if (cart.length === 0) { %>
+    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+      <div class="fs-1">🛒</div>
+      <h4 class="text-muted mt-3">Giỏ hàng trống</h4>
+      <a href="/products" class="btn btn-primary mt-3">Mua sắm ngay</a>
+    </div>
+  <% } else { %>
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="bg-white rounded-3 shadow-sm p-3">
+          <% cart.forEach(item => { %>
+          <div class="d-flex align-items-center gap-3 py-3 border-bottom">
+            <img src="<%= item.image %>" width="80" height="80" style="object-fit:contain;" class="rounded">
+            <div class="flex-grow-1">
+              <div class="fw-600"><%= item.name %></div>
+              <div class="text-warning fw-bold"><%= item.price.toLocaleString('vi-VN') %> đ</div>
+            </div>
+            <form method="POST" action="/cart/update" class="d-flex align-items-center gap-2">
+              <input type="hidden" name="productId" value="<%= item.productId %>">
+              <input type="number" name="quantity" value="<%= item.quantity %>" min="1" class="form-control" style="width:65px">
+              <button class="btn btn-sm btn-outline-secondary">Cập nhật</button>
+            </form>
+            <div class="text-warning fw-bold"><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</div>
+            <form method="POST" action="/cart/remove">
+              <input type="hidden" name="productId" value="<%= item.productId %>">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-white rounded-3 shadow-sm p-4">
+          <h5 class="fw-bold mb-3">Tóm tắt đơn hàng</h5>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Tạm tính:</span>
+            <span><%= total.toLocaleString('vi-VN') %> đ</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Phí vận chuyển:</span>
+            <span class="text-success">Miễn phí</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4">
+            <span class="fw-bold fs-5">Tổng cộng:</span>
+            <span class="cart-total"><%= total.toLocaleString('vi-VN') %> đ</span>
+          </div>
+          <a href="/orders/checkout" class="btn btn-primary w-100 py-2">Thanh toán ngay →</a>
+          <a href="/products" class="btn btn-outline-secondary w-100 mt-2">Tiếp tục mua sắm</a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

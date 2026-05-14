@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+<div class="container-fluid px-4 py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="section-title mb-0"><i class="bi bi-<%= product ? 'pencil-square' : 'plus-circle' %>"></i> <%= title %></h2>
+    <a href="javascript:history.back()" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>
+  </div>
+  
+  <div class="row">
+    <div class="col-12">
+      <div class="bg-white rounded-3 shadow-sm p-4">
+        <% if (error) { %>
+          <div class="alert alert-danger"><i class="bi bi-exclamation-circle"></i> <%= error %></div>
+        <% } %>
+        
+        <form method="POST" action="<%= formAction %>" enctype="multipart/form-data">
+          <div class="row g-4">
+            <!-- Hàng 1: Các thông tin cơ bản kéo dài theo chiều ngang -->
+            <div class="col-xl-4 col-md-6">
+              <label class="form-label fw-bold">Tên sản phẩm <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control form-control-lg" value="<%= product ? product.name : '' %>" placeholder="Nhập tên sản phẩm..." required>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+              <label class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+              <select name="category" class="form-select form-select-lg" required>
+                <option value="tank"       <%= product && product.category==='tank'       ? 'selected':'' %>>🏘️ Bể & Lồng nuôi</option>
+                <option value="food"       <%= product && product.category==='food'       ? 'selected':'' %>>🌿 Thức ăn</option>
+                <option value="accessory"  <%= product && product.category==='accessory'  ? 'selected':'' %>>🎯 Phụ kiện</option>
+                <option value="reptile"    <%= product && product.category==='reptile'    ? 'selected':'' %>>🦎 Bò sát cảnh</option>
+                <option value="hamster"    <%= product && product.category==='hamster'    ? 'selected':'' %>>🐹 Chuột Hamster</option>
+                <option value="medicine"   <%= product && product.category==='medicine'   ? 'selected':'' %>>💊 Thuốc & Vitamin</option>
+                <option value="clothing"   <%= product && product.category==='clothing'   ? 'selected':'' %>>👗 Quần áo thú cưng</option>
+                <option value="fish"       <%= product && product.category==='fish'       ? 'selected':'' %>>🐠 Cá cảnh</option>
+              </select>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+              <label class="form-label fw-bold">Giá (VNĐ) <span class="text-danger">*</span></label>
+              <div class="input-group input-group-lg">
+                <input type="number" name="price" class="form-control" value="<%= product ? product.price : '' %>" placeholder="0" min="0" required>
+                <span class="input-group-text">đ</span>
+              </div>
+            </div>
+            
+            <div class="col-xl-2 col-md-6">
+              <label class="form-label fw-bold">Tồn kho <span class="text-danger">*</span></label>
+              <div class="input-group input-group-lg">
+                <input type="number" name="stock" class="form-control" value="<%= product ? product.stock : 0 %>" min="0" required>
+                <span class="input-group-text">sản phẩm</span>
+              </div>
+            </div>
+
+            <!-- Hàng 2: Mô tả và Ảnh sản phẩm song song -->
+            <div class="col-lg-7">
+              <label class="form-label fw-bold">Mô tả sản phẩm</label>
+              <textarea name="description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về sản phẩm..."><%= product ? product.description : '' %></textarea>
+            </div>
+            
+            <div class="col-lg-5">
+              <label class="form-label fw-bold">Ảnh sản phẩm</label>
+              <div class="card p-3 bg-light border-dashed">
+                <% if (product && product.image && product.image !== '/images/default.jpg') { %>
+                  <div class="d-flex align-items-center gap-3 mb-3">
+                    <img src="<%= product.image %>" width="80" height="80" style="object-fit:contain;border-radius:8px;border:1px solid #ddd;padding:4px;background:#fff">
+                    <div>
+                      <span class="badge bg-secondary mb-1">Ảnh hiện tại</span>
+                      <div class="small text-muted text-truncate" style="max-width:200px;"><%= product.image %></div>
+                    </div>
+                  </div>
+                <% } %>
+                <input type="file" name="image" class="form-control" accept="image/*">
+                <div class="form-text mt-2">Để trống nếu không muốn thay đổi ảnh sản phẩm.</div>
+              </div>
+            </div>
+
+            <!-- Hàng nút bấm kích thước lớn cố định bên phải để chốt form -->
+            <div class="col-12 text-end mt-4">
+              <button type="submit" class="btn btn-primary btn-lg px-5 py-3 shadow-sm">
+                <i class="bi bi-<%= product ? 'check-circle' : 'plus-circle' %> me-2"></i>
+                <%= product ? 'Lưu thay đổi' : 'Thêm sản phẩm mới' %>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

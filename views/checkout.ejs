@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+<div class="container-fluid px-4 py-5">
+  <h2 class="section-title mb-4"><i class="bi bi-credit-card"></i> Thanh toán đơn hàng</h2>
+  
+  <div class="row g-4">
+    <!-- Cột trái: Form nhập thông tin trải rộng -->
+    <div class="col-xl-8 col-lg-7">
+      <div class="bg-white rounded-3 shadow-sm p-4">
+        <h5 class="fw-bold mb-4 border-bottom pb-2 text-primary">Thông tin giao hàng & Thanh toán</h5>
+        <% if (error) { %>
+          <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+        
+        <form method="POST" action="/orders/checkout">
+          <div class="row g-4">
+            <!-- Hàng 1: Họ tên và Số điện thoại -->
+            <div class="col-md-6">
+              <label class="form-label fw-600">Họ tên người nhận <span class="text-danger">*</span></label>
+              <input type="text" name="fullName" class="form-control form-control-lg" placeholder="Nhập họ và tên..." required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-600">Số điện thoại <span class="text-danger">*</span></label>
+              <input type="text" name="phone" class="form-control form-control-lg" placeholder="Nhập số điện thoại di động..." required>
+            </div>
+            
+            <!-- Hàng 2: Địa chỉ cụ thể và Thành phố -->
+            <div class="col-md-8">
+              <label class="form-label fw-600">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+              <input type="text" name="address" class="form-control form-control-lg" placeholder="Số nhà, ngõ ngách, tên đường..." required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-600">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+              <input type="text" name="city" class="form-control form-control-lg" placeholder="Ví dụ: Hà Nội, TP.HCM..." required>
+            </div>
+            
+            <!-- Hàng 3: Phương thức thanh toán và Ghi chú -->
+            <div class="col-md-5">
+              <label class="form-label fw-600">Phương thức thanh toán <span class="text-danger">*</span></label>
+              <select name="paymentMethod" class="form-select form-select-lg">
+                <option value="cod">💵 Thanh toán khi nhận hàng (COD)</option>
+                <option value="bank">🏦 Chuyển khoản ngân hàng</option>
+              </select>
+            </div>
+            <div class="col-md-7">
+              <label class="form-label fw-600">Ghi chú giao hàng</label>
+              <textarea name="note" class="form-control" rows="2" placeholder="Ghi chú thêm cho shipper hoặc cửa hàng (nếu có)..."></textarea>
+            </div>
+            
+            <!-- Nút submit kéo dài vừa vặn hàng -->
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-success w-100 py-3 fs-5 shadow-sm">
+                <i class="bi bi-shield-check me-2"></i> Xác nhận và Đặt hàng ngay
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Cột phải: Tóm tắt đơn hàng bên cạnh -->
+    <div class="col-xl-4 col-lg-5">
+      <div class="bg-white rounded-3 shadow-sm p-4 sticky-top" style="top: 20px;">
+        <h5 class="fw-bold mb-3 border-bottom pb-2">Đơn hàng của bạn</h5>
+        <div class="cart-items-review mb-3" style="max-height: 400px; overflow-y: auto;">
+          <% cart.forEach(item => { %>
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <img src="<%= item.image %>" width="56" height="56" style="object-fit:contain;border-radius:8px;background:#f8f9fa;padding:4px">
+              <div>
+                <div class="fw-600 small text-wrap" style="max-width: 180px;"><%= item.name %></div>
+                <small class="text-muted">Số lượng: x<%= item.quantity %></small>
+              </div>
+            </div>
+            <div class="fw-bold text-dark"><%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ</div>
+          </div>
+          <% }) %>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+          <span class="fw-bold fs-5">Tổng cộng:</span>
+          <span class="cart-total text-danger fw-bold fs-4"><%= total.toLocaleString('vi-VN') %> đ</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

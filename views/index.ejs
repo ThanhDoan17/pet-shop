@@ -1,0 +1,499 @@
+<%- include('partials/header') %>
+
+<!-- THANH TÌM KIẾM ĐỘC LẬP (NẰM DƯỚI MENU CHÍNH VÀ TRÊN SLIDE BANNER) -->
+<section class="index-search-divider">
+  <div class="container">
+    <form action="/products" method="GET" class="index-search-form">
+      <div class="index-search-input-group">
+        <i class="bi bi-search search-icon-anchor"></i>
+        <input type="text" name="search" placeholder="Tìm kiếm thú cưng, bể nuôi, thức ăn hoặc phụ kiện cao cấp...">
+        <button type="submit">Tìm ngay</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+/* HỆ THỐNG MÃ CSS TỐI ƯU HIỂN THỊ CHO THANH TÌM KIẾM TRANG CHỦ */
+.index-search-divider {
+  background-color: #383f55;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+.index-search-form {
+  max-width: 650px;
+  margin: 0 auto;
+}
+.index-search-input-group {
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6; /* Màu nền xám nhạt hiện đại */
+  border: 1px solid #d1d5db;
+  border-radius: 12px; /* Bo góc mềm mại sang trọng */
+  padding: 4px 6px 4px 16px;
+  transition: all 0.25s ease;
+}
+.search-icon-anchor {
+  color: #9ca3af;
+  font-size: 1.1rem;
+  margin-right: 12px;
+}
+.index-search-input-group input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  color: #111827;
+  padding: 10px 0;
+}
+.index-search-input-group input::placeholder {
+  color: #9ca3af;
+}
+.index-search-input-group button {
+  background-color: #2563eb; /* Màu xanh nước biển chủ đạo của Bootstrap */
+  color: #ffffff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.index-search-input-group button:hover {
+  background-color: #1d4ed8; /* Tối màu hơn khi di chuột */
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
+}
+/* Hiệu ứng kích hoạt khi người dùng nhấp chuột vào ô nhập liệu */
+.index-search-input-group:focus-within {
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* Đảm bảo khoảng cách giao diện mượt mà trên thiết bị di động */
+@media (max-width: 576px) {
+  .index-search-divider {
+    padding: 15px 0;
+  }
+  .index-search-input-group {
+    padding: 4px 4px 4px 12px;
+  }
+  .index-search-input-group button {
+    padding: 8px 16px;
+  }
+}
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-left">
+      <span>🚚 Freeship đơn từ 200k</span>
+      <span class="topbar-divider">|</span>
+      <span>📞 Hotline: <a href="tel:0985395024">098.539.5024</a></span>
+    </div>
+    <div class="topbar-right">
+      <span id="topbar-time"></span>
+      <span class="topbar-divider">|</span>
+      <a href="/auth/login">Đăng nhập</a>
+      <span class="topbar-divider">|</span>
+      <a href="/auth/register">Đăng ký</a>
+    </div>
+  </div>
+</div>
+
+<!-- FLASH SALE TICKER -->
+<div class="flash-ticker">
+  <div class="ticker-inner">
+    <span class="ticker-label">⚡ FLASH SALE</span>
+    <div class="countdown-wrap">
+      <span class="cd-box" id="cd-h">00</span>
+      <span class="cd-sep">:</span>
+      <span class="cd-box" id="cd-m">00</span>
+      <span class="cd-sep">:</span>
+      <span class="cd-box" id="cd-s">00</span>
+    </div>
+    <span class="ticker-msg">Ưu đãi hôm nay — Số lượng có hạn!</span>
+  </div>
+</div>
+
+<!-- HERO SLIDER -->
+<section class="hero-section">
+  <div class="hero-slider" id="heroSlider">
+
+    <!-- SLIDE 1: Video YouTube -->
+    <div class="hero-slide active" data-type="video">
+      <div class="slide-media">
+        <iframe
+          src="https://www.youtube.com/embed/XVkADAwOXnU?autoplay=1&mute=1&loop=1&playlist=XVkADAwOXnU&controls=0&showinfo=0&rel=0&modestbranding=1"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+          class="slide-iframe">
+        </iframe>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <p class="slide-eyebrow">Bộ sưu tập mới</p>
+        <h1 class="slide-title">Thiên đường<br><span class="slide-accent">Thú cưng</span></h1>
+        <p class="slide-sub">Bể cá — Bò sát — Hamster — Phụ kiện cao cấp</p>
+        <div class="slide-actions">
+          <a href="/products" class="btn-hero-primary">Mua sắm ngay</a>
+          <a href="/products?category=fish" class="btn-hero-ghost">Khám phá cá cảnh</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Video YouTube 2 -->
+    <!-- SLIDE 2: Đã thay video bằng ảnh nền tràn khung -->
+    <div class="hero-slide" data-type="image" style="background-image: url('/picture/6.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+      <div class="slide-overlay slide-overlay--blue"></div>
+      <div class="slide-content">
+        <p class="slide-eyebrow">Thế giới bò sát</p>
+        <h1 class="slide-title">Độc đáo &<br><span class="slide-accent">Cuốn hút</span></h1>
+        <p class="slide-sub">Rồng cảnh, Rùa, Tắc kè — Hàng chất lượng cao</p>
+        <div class="slide-actions">
+          <a href="/products?category=reptile" class="btn-hero-primary">Khám phá ngay</a>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- SLIDE 3: Thay background bằng: style="background-image:url('/picture/TEN_ANH.jpg')" -->
+    <div class="hero-slide" data-type="image" style="background:linear-gradient(135deg,#1a0a2e 0%,#16213e 50%,#0f3460 100%);">
+      <div class="slide-overlay slide-overlay--warm">
+          <iframe
+          src="https://www.youtube.com/embed/Vr9mZ6jTCkg?autoplay=1&mute=1&loop=1&playlist=Vr9mZ6jTCkg&controls=0&showinfo=0&rel=0&modestbranding=1"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+          class="slide-iframe">
+        </iframe>
+      </div>
+      <div class="slide-content">
+        <p class="slide-eyebrow">Chuột Hamster</p>
+        <h1 class="slide-title">Dễ thương<br><span class="slide-accent">Đáng yêu</span></h1>
+        <p class="slide-sub">Hamster, Lồng cao cấp, Thức ăn đầy đủ dinh dưỡng</p>
+        <div class="slide-actions">
+          <a href="/products?category=hamster" class="btn-hero-primary">Xem ngay</a>
+          <a href="/products?category=food" class="btn-hero-ghost">Thức ăn</a>
+        </div>
+      </div>
+    </div>
+
+    <button class="hero-arrow hero-arrow--prev" onclick="heroSlide(-1)">&#8249;</button>
+    <button class="hero-arrow hero-arrow--next" onclick="heroSlide(1)">&#8250;</button>
+    <div class="hero-dots">
+      <span class="hero-dot active" onclick="heroGoTo(0)"></span>
+      <span class="hero-dot" onclick="heroGoTo(1)"></span>
+      <span class="hero-dot" onclick="heroGoTo(2)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK CATEGORY GRID -->
+<section class="section-categories reveal">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title">Danh mục sản phẩm</h2>
+    </div>
+    <div class="cat-grid">
+      <a href="/products?category=fish" class="cat-item">
+        <div class="cat-icon-bg" style="background:#e8f5e9">🐠</div>
+        <span>Cá cảnh</span>
+      </a>
+      <a href="/products?category=tank" class="cat-item">
+        <div class="cat-icon-bg" style="background:#e3f2fd">🏘️</div>
+        <span>Bể & Lồng</span>
+      </a>
+      <a href="/products?category=hamster" class="cat-item">
+        <div class="cat-icon-bg" style="background:#fff3e0">🐹</div>
+        <span>Hamster</span>
+      </a>
+      <a href="/products?category=reptile" class="cat-item">
+        <div class="cat-icon-bg" style="background:#f3e5f5">🦎</div>
+        <span>Bò sát</span>
+      </a>
+      <a href="/products?category=food" class="cat-item">
+        <div class="cat-icon-bg" style="background:#e8f5e9">🌿</div>
+        <span>Thức ăn</span>
+      </a>
+      <a href="/products?category=medicine" class="cat-item">
+        <div class="cat-icon-bg" style="background:#fce4ec">💊</div>
+        <span>Thuốc</span>
+      </a>
+      <a href="/products?category=accessory" class="cat-item">
+        <div class="cat-icon-bg" style="background:#e0f7fa">🎯</div>
+        <span>Phụ kiện</span>
+      </a>
+      <a href="/products?category=clothing" class="cat-item">
+        <div class="cat-icon-bg" style="background:#fff8e1">👗</div>
+        <span>Quần áo</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PROMO MINI BANNERS -->
+<section class="section-promo reveal">
+  <div class="container">
+    <div class="promo-grid">
+      
+      <!-- Khung 1: Cá cảnh đẹp -> Chèn ảnh 7.jpg -->
+      <a href="/products?category=fish" class="promo-card promo-green" style="background-image: linear-gradient(to right, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%), url('/picture/7.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="promo-content">
+          <span class="promo-tag">Mới về</span>
+          <h3>Cá cảnh đẹp</h3>
+          <p>Freeship từ 200k</p>
+          <span class="promo-cta">Xem ngay →</span>
+        </div>
+      </a>
+
+      <!-- Khung 2: Hamster dễ thương -> Chèn ảnh 8.jpg -->
+      <a href="/products?category=hamster" class="promo-card promo-blue" style="background-image: linear-gradient(to right, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%), url('/picture/8.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="promo-content">
+          <span class="promo-tag">Hot</span>
+          <h3>Hamster dễ thương</h3>
+          <p>Giảm đến 30%</p>
+          <span class="promo-cta">Mua ngay →</span>
+        </div>
+      </a>
+
+      <!-- Khung 3: Bò sát cảnh -> Chèn ảnh 9.jpg -->
+      <a href="/products?category=reptile" class="promo-card promo-dark" style="background-image: linear-gradient(to right, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0) 100%), url('/picture/9.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+        <div class="promo-content">
+          <span class="promo-tag">Độc lạ</span>
+          <h3>Bò sát cảnh</h3>
+          <p>Hàng nhập khẩu</p>
+          <span class="promo-cta">Khám phá →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- FEATURED PRODUCTS -->
+<section class="section-products reveal">
+  <div class="container">
+    <div class="section-head section-head--flex">
+      <div>
+        <span class="section-eyebrow">Bán chạy nhất</span>
+        <h2 class="section-title">Sản phẩm nổi bật 🔥</h2>
+      </div>
+      <a href="/products" class="btn-see-all">Xem tất cả →</a>
+    </div>
+    <div class="product-grid" id="featured-products">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LUXURY SHOWCASE 1 -->
+<section class="section-showcase reveal">
+  <div class="container">
+    <div class="showcase-grid showcase-grid--left">
+      <div class="showcase-banner showcase-banner--green">
+        <!-- PLACEHOLDER: thêm background-image: url('/picture/TEN_ANH.jpg') vào .showcase-banner--green trong CSS -->
+        <div class="showcase-banner-content">
+          <h3>Thế giới cá cảnh</h3>
+          <p>Hàng trăm loài cá đẹp từ khắp nơi trên thế giới</p>
+          <a href="/products?category=fish" class="btn-showcase">Khám phá →</a>
+        </div>
+      </div>
+      <div class="showcase-products" id="showcase-fish">
+        <div class="skeleton"></div><div class="skeleton"></div>
+        <div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LUXURY SHOWCASE 2 -->
+<section class="section-showcase section-showcase--alt reveal">
+  <div class="container">
+    <div class="showcase-grid showcase-grid--right">
+      <div class="showcase-products" id="showcase-reptile">
+        <div class="skeleton"></div><div class="skeleton"></div>
+        <div class="skeleton"></div><div class="skeleton"></div>
+      </div>
+      <div class="showcase-banner showcase-banner--dark">
+        <!-- PLACEHOLDER: thêm background-image: url('/picture/TEN_ANH.jpg') vào .showcase-banner--dark trong CSS -->
+        <div class="showcase-banner-content">
+          <h3>Bò sát cảnh</h3>
+          <p>Rồng Bearded Dragon, Rùa cạn, Tắc kè leo tường</p>
+          <a href="/products?category=reptile" class="btn-showcase">Xem thêm →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- CHATBOT -->
+<button class="chatbot-btn" onclick="toggleChat()" title="Hỗ trợ">
+  <i class="bi bi-chat-dots-fill"></i>
+  <span class="chatbot-pulse"></span>
+</button>
+
+<div class="chatbot-box" id="chatbot">
+  <div class="chatbot-header">
+    <div class="chatbot-header-info">
+      <div class="chatbot-avatar">🐠</div>
+      <div>
+        <strong>PESTshop Hỗ trợ</strong>
+        <span class="chatbot-status">● Trực tuyến</span>
+      </div>
+    </div>
+    <button class="chatbot-close" onclick="toggleChat()">×</button>
+  </div>
+  <div class="chatbot-messages" id="chat-messages">
+    <div class="chat-msg chat-msg--bot">Xin chào! Tôi là trợ lý ảo của PESTshop 🐠<br>Tôi có thể giúp gì cho bạn?</div>
+  </div>
+  <div class="chatbot-suggestions">
+    <button class="chat-chip" onclick="askBot('gio-mo-cua')">⏰ Giờ mở cửa</button>
+    <button class="chat-chip" onclick="askBot('van-chuyen')">🚚 Vận chuyển</button>
+    <button class="chat-chip" onclick="askBot('doi-tra')">🔄 Đổi trả</button>
+    <button class="chat-chip" onclick="askBot('san-pham')">🐠 Sản phẩm</button>
+    <button class="chat-chip" onclick="askBot('lien-he')">📞 Liên hệ</button>
+    <button class="chat-chip" onclick="askBot('thanh-toan')">💳 Thanh toán</button>
+  </div>
+  <div class="chatbot-input-row">
+    <input type="text" id="chat-input" placeholder="Nhập câu hỏi..." onkeypress="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()"><i class="bi bi-send-fill"></i></button>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+/* HERO SLIDER */
+let hCurrent = 0;
+const hSlides = document.querySelectorAll('.hero-slide');
+const hDots   = document.querySelectorAll('.hero-dot');
+function heroGoTo(n) {
+  hSlides[hCurrent].classList.remove('active');
+  hDots[hCurrent].classList.remove('active');
+  hCurrent = (n + hSlides.length) % hSlides.length;
+  hSlides[hCurrent].classList.add('active');
+  hDots[hCurrent].classList.add('active');
+}
+function heroSlide(dir) { heroGoTo(hCurrent + dir); }
+setInterval(() => heroSlide(1), 6000);
+
+/* COUNTDOWN */
+function updateCountdown() {
+  const now = new Date(), end = new Date();
+  end.setHours(23, 59, 59, 0);
+  const d = end - now;
+  document.getElementById('cd-h').textContent = String(Math.floor(d/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000); updateCountdown();
+
+/* TOPBAR CLOCK */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('topbar-time').textContent =
+    now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+/* SCROLL REVEAL */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+/* PRODUCT CARD */
+function productCard(p) {
+  return `
+  <div class="pcard">
+    <a href="/products/${p._id}" class="pcard-img-wrap">
+      <img src="${p.image}" alt="${p.name}" loading="lazy">
+      <span class="pcard-badge">Mới</span>
+    </a>
+    <div class="pcard-body">
+      <p class="pcard-name">${p.name}</p>
+      <p class="pcard-price">${p.price.toLocaleString('vi-VN')} đ</p>
+      <a href="/products/${p._id}" class="pcard-btn">Xem chi tiết</a>
+    </div>
+  </div>`;
+}
+
+/* LOAD PRODUCTS */
+fetch('/api/featured-products')
+  .then(r => r.json())
+  .then(products => {
+    document.getElementById('featured-products').innerHTML =
+      products.length ? products.map(productCard).join('') : '<p class="no-products">Chưa có sản phẩm.</p>';
+
+    const fish = products.filter(p => p.category === 'fish').slice(0,4);
+    document.getElementById('showcase-fish').innerHTML =
+      (fish.length ? fish : products.slice(0,4)).map(productCard).join('');
+
+    const rep = products.filter(p => p.category === 'reptile').slice(0,4);
+    document.getElementById('showcase-reptile').innerHTML =
+      (rep.length ? rep : products.slice(0,4)).map(productCard).join('');
+  })
+  .catch(() => {
+    document.getElementById('featured-products').innerHTML = '<p class="no-products">Không thể tải sản phẩm.</p>';
+  });
+
+/* CHATBOT */
+const faqData = {
+  'gio-mo-cua': 'Cửa hàng mở cửa từ <b>8:00 – 21:30</b> tất cả các ngày trong tuần! 🎉',
+  'van-chuyen': 'Giao hàng <b>toàn quốc 2-3 ngày</b>. Miễn phí từ <b>200.000đ</b>.',
+  'doi-tra': 'Đổi trả miễn phí trong <b>7 ngày</b> nếu sản phẩm lỗi.',
+  'san-pham': '🐠 Cá cảnh, 🦎 Bò sát, 🐹 Hamster, 🌿 Thức ăn, 🏘️ Bể & Lồng, 💊 Thuốc, 🎯 Phụ kiện, 👗 Quần áo.',
+  'lien-he': '📞 <b>098.539.5024</b><br>✉️ <b>thanhdoankx@gmail.com</b>',
+  'thanh-toan': '💵 COD, 🏦 Chuyển khoản, 💳 Visa/Mastercard.'
+};
+const faqLabels = {
+  'gio-mo-cua':'Giờ mở cửa?','van-chuyen':'Vận chuyển?',
+  'doi-tra':'Đổi trả?','san-pham':'Sản phẩm gì?',
+  'lien-he':'Liên hệ?','thanh-toan':'Thanh toán?'
+};
+
+function toggleChat() { document.getElementById('chatbot').classList.toggle('open'); }
+
+function addMsg(html, type) {
+  const msgs = document.getElementById('chat-messages');
+  const d = document.createElement('div');
+  d.className = `chat-msg chat-msg--${type}`;
+  d.innerHTML = html;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function askBot(key) {
+  addMsg(faqLabels[key], 'user');
+  setTimeout(() => addMsg(faqData[key] || 'Vui lòng gọi <b>098.539.5024</b>!', 'bot'), 350);
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  input.value = '';
+  const t = text.toLowerCase();
+  let reply = 'Vui lòng gọi <b>098.539.5024</b> để hỗ trợ trực tiếp!';
+  if (t.includes('giờ')||t.includes('mở')) reply = faqData['gio-mo-cua'];
+  else if (t.includes('ship')||t.includes('giao')) reply = faqData['van-chuyen'];
+  else if (t.includes('đổi')||t.includes('trả')) reply = faqData['doi-tra'];
+  else if (t.includes('sản phẩm')||t.includes('bán')) reply = faqData['san-pham'];
+  else if (t.includes('thanh toán')||t.includes('cod')) reply = faqData['thanh-toan'];
+  else if (t.includes('liên hệ')||t.includes('điện thoại')) reply = faqData['lien-he'];
+  setTimeout(() => addMsg(reply, 'bot'), 350);
+}
+</script>

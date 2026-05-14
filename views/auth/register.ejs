@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+<div class="container">
+  <div class="auth-card">
+    <h1 class="text-center"><i class="bi bi-person-plus"></i> Đăng ký</h1>
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/auth/register">
+      <div class="mb-3">
+        <label class="form-label">Họ tên</label>
+        <input type="text" name="name" class="form-control" placeholder="Nhập họ tên" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" placeholder="Nhập email" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Mật khẩu</label>
+        <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Xác nhận mật khẩu</label>
+        <input type="password" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2">Đăng ký</button>
+    </form>
+    <p class="text-center mt-3">Đã có tài khoản? <a href="/auth/login">Đăng nhập</a></p>
+  </div>
+</div>
+<%- include('../partials/footer') %>

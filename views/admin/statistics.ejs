@@ -1,0 +1,154 @@
+<%- include('../partials/header') %>
+<div class="container py-4">
+  <h2 class="section-title"><i class="bi bi-bar-chart"></i> Thống kê & Báo cáo</h2>
+
+  <!-- Nav admin -->
+  <div class="mb-4">
+    <a href="/admin" class="btn btn-outline-secondary btn-sm me-2">Dashboard</a>
+    <a href="/admin/products" class="btn btn-outline-secondary btn-sm me-2">Sản phẩm</a>
+    <a href="/admin/orders" class="btn btn-outline-secondary btn-sm me-2">Đơn hàng</a>
+    <a href="/admin/statistics" class="btn btn-dark btn-sm">Thống kê</a>
+  </div>
+
+  <!-- TỔNG QUAN SẢN PHẨM -->
+  <h5 class="fw-bold mb-3">📦 Thống kê kho hàng</h5>
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-primary"><%= totalProducts %></div>
+        <div class="text-muted small">Tổng sản phẩm</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-success"><%= totalValue.toLocaleString('vi-VN') %>đ</div>
+        <div class="text-muted small">Tổng giá trị kho</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-warning"><%= maxPrice.toLocaleString('vi-VN') %>đ</div>
+        <div class="text-muted small">Giá cao nhất</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-danger"><%= minPrice.toLocaleString('vi-VN') %>đ</div>
+        <div class="text-muted small">Giá thấp nhất</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-info"><%= avgPrice.toLocaleString('vi-VN') %>đ</div>
+        <div class="text-muted small">Giá trung bình</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-success"><%= totalOrders %></div>
+        <div class="text-muted small">Tổng đơn hàng</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="bg-white rounded-3 shadow-sm p-4 text-center">
+        <div class="fs-2 fw-bold text-warning"><%= revenue.toLocaleString('vi-VN') %>đ</div>
+        <div class="text-muted small">Tổng doanh thu</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THỐNG KÊ THEO THỜI GIAN -->
+  <h5 class="fw-bold mb-3">📊 Thống kê doanh thu</h5>
+  <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+    <form method="GET" action="/admin/statistics" class="row g-2 mb-4">
+      <div class="col-md-3">
+        <select name="type" class="form-select">
+          <option value="day" <%= type === 'day' ? 'selected' : '' %>>Theo ngày (trong tháng)</option>
+          <option value="month" <%= type === 'month' ? 'selected' : '' %>>Theo tháng (trong năm)</option>
+          <option value="year" <%= type === 'year' ? 'selected' : '' %>>Theo năm</option>
+        </select>
+      </div>
+      <% if (type !== 'year') { %>
+      <div class="col-md-2">
+        <input type="number" name="year" value="<%= year %>" class="form-control" placeholder="Năm" min="2020" max="2030">
+      </div>
+      <% } %>
+      <% if (type === 'day') { %>
+      <div class="col-md-2">
+        <input type="number" name="month" value="<%= month %>" class="form-control" placeholder="Tháng" min="1" max="12">
+      </div>
+      <% } %>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Xem</button>
+      </div>
+    </form>
+
+    <% if (orderStats.length === 0) { %>
+      <p class="text-muted text-center py-4">Chưa có dữ liệu cho khoảng thời gian này</p>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th><%= labelFormat %></th>
+              <th>Số đơn</th>
+              <th>Doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orderStats.forEach(s => { %>
+            <tr>
+              <td><%= labelFormat %> <%= s._id %></td>
+              <td><span class="badge bg-primary"><%= s.count %> đơn</span></td>
+              <td class="fw-bold text-success"><%= s.total.toLocaleString('vi-VN') %> đ</td>
+            </tr>
+            <% }) %>
+          </tbody>
+          <tfoot class="table-secondary">
+            <tr>
+              <td><strong>Tổng cộng</strong></td>
+              <td><strong><%= orderStats.reduce((s,i) => s+i.count, 0) %> đơn</strong></td>
+              <td><strong class="text-success"><%= orderStats.reduce((s,i) => s+i.total, 0).toLocaleString('vi-VN') %> đ</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- TOP SẢN PHẨM BÁN CHẠY -->
+  <h5 class="fw-bold mb-3">🏆 Top 5 sản phẩm bán chạy</h5>
+  <div class="bg-white rounded-3 shadow-sm p-4">
+    <% if (topProducts.length === 0) { %>
+      <p class="text-muted text-center py-4">Chưa có dữ liệu</p>
+    <% } else { %>
+      <table class="table table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng bán</th>
+            <th>Doanh thu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% topProducts.forEach((p, i) => { %>
+          <tr>
+            <td>
+              <% if (i === 0) { %> 🥇
+              <% } else if (i === 1) { %> 🥈
+              <% } else if (i === 2) { %> 🥉
+              <% } else { %> <%= i+1 %>
+              <% } %>
+            </td>
+            <td><%= p._id %></td>
+            <td><span class="badge bg-info"><%= p.totalQty %></span></td>
+            <td class="fw-bold text-success"><%= p.totalRevenue.toLocaleString('vi-VN') %> đ</td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
+<%- include('../partials/footer') %>
