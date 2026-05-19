@@ -107,4 +107,50 @@ exports.createProductReview = async (req, res) => {
   }
 };
 
+// 4. Admin/Staff phản hồi đánh giá
+exports.replyReview = async (req, res) => {
+  try {
+    const { reviewId, productId } = req.params;
+    const { reply } = req.body;
+    const currentUser = req.session.user;
+
+    if (!currentUser || !['admin', 'staff'].includes(currentUser.role)) {
+      return res.redirect(`/products/${productId}`);
+    }
+
+    await Review.findByIdAndUpdate(reviewId, {
+      reply: reply.trim(),
+      replyAt: new Date(),
+      replyBy: currentUser.name
+    });
+
+    res.redirect(`/products/${productId}`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/products/${productId}`);
+  }
+};
+
+// 5. Admin/Staff xóa phản hồi
+exports.deleteReply = async (req, res) => {
+  try {
+    const { reviewId, productId } = req.params;
+    const currentUser = req.session.user;
+
+    if (!currentUser || !['admin', 'staff'].includes(currentUser.role)) {
+      return res.redirect(`/products/${productId}`);
+    }
+
+    await Review.findByIdAndUpdate(reviewId, {
+      reply: '',
+      replyAt: null,
+      replyBy: ''
+    });
+
+    res.redirect(`/products/${productId}`);
+  } catch (err) {
+    console.error(err);
+    res.redirect(`/products/${productId}`);
+  }
+};
 
