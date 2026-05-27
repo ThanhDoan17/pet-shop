@@ -115,4 +115,11 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'Pet Shop' });
 });
 const PORT = process.env.PORT || 3000;
+
+if (process.env.NODE_ENV === 'production') {
+  setInterval(() => {
+    const url = process.env.RENDER_URL || '';
+    if (url) require('https').get(url).on('error', () => {});
+  }, 10 * 60 * 1000);
+}
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

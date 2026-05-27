@@ -1,91 +1,96 @@
 <%- include('partials/header') %>
 
-<!-- THANH TÌM KIẾM ĐỘC LẬP (NẰM DƯỚI MENU CHÍNH VÀ TRÊN SLIDE BANNER) -->
+<!-- THANH TÌM KIẾM NÂNG CẤP CÓ DROPDOWN DANH MỤC -->
 <section class="index-search-divider">
   <div class="container">
     <form action="/products" method="GET" class="index-search-form">
       <div class="index-search-input-group">
         <i class="bi bi-search search-icon-anchor"></i>
-        <input type="text" name="search" placeholder="Tìm kiếm thú cưng, bể nuôi, thức ăn hoặc phụ kiện cao cấp...">
-        <button type="submit">Tìm ngay</button>
+        <!-- DROPDOWN DANH MỤC - THÊM MỚI -->
+        <select name="category" class="search-category-select">
+          <option value="">Tất cả</option>
+          <option value="fish">🐠 Cá cảnh</option>
+          <option value="tank">🏘️ Bể & Lồng</option>
+          <option value="hamster">🐹 Hamster</option>
+          <option value="reptile">🦎 Bò sát</option>
+          <option value="food">🌿 Thức ăn</option>
+          <option value="medicine">💊 Thuốc</option>
+          <option value="accessory">🎯 Phụ kiện</option>
+          <option value="clothes">👗 Quần áo</option>
+        </select>
+        <div class="search-vdivider"></div>
+        <input type="text" name="search"
+          placeholder="Tìm kiếm thú cưng, bể nuôi, thức ăn...">
+        <button type="submit">
+          <i class="bi bi-search me-1"></i>Tìm ngay
+        </button>
       </div>
     </form>
   </div>
 </section>
 
 <style>
-/* HỆ THỐNG MÃ CSS TỐI ƯU HIỂN THỊ CHO THANH TÌM KIẾM TRANG CHỦ */
 .index-search-divider {
-  background-color: #383f55;
-  padding: 20px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  background-color: #1a2232;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
-.index-search-form {
-  max-width: 650px;
-  margin: 0 auto;
-}
+.index-search-form { max-width: 720px; margin: 0 auto; }
 .index-search-input-group {
   display: flex;
   align-items: center;
-  background-color: #f3f4f6; /* Màu nền xám nhạt hiện đại */
-  border: 1px solid #d1d5db;
-  border-radius: 12px; /* Bo góc mềm mại sang trọng */
-  padding: 4px 6px 4px 16px;
-  transition: all 0.25s ease;
+  background: #fff;
+  border-radius: 4px;
+  padding: 3px 3px 3px 14px;
+  transition: box-shadow 0.2s;
+}
+.index-search-input-group:focus-within {
+  box-shadow: 0 0 0 3px rgba(13,110,253,0.3);
 }
 .search-icon-anchor {
-  color: #9ca3af;
-  font-size: 1.1rem;
-  margin-right: 12px;
+  color: #999; font-size: 1rem; margin-right: 6px; flex-shrink: 0;
+}
+/* DROPDOWN MỚI */
+.search-category-select {
+  border: none; outline: none;
+  background: transparent;
+  font-size: 0.85rem;
+  color: #444;
+  cursor: pointer;
+  padding: 6px 4px;
+  max-width: 130px;
+  flex-shrink: 0;
+}
+.search-vdivider {
+  width: 1px; height: 20px;
+  background: #e0e0e0;
+  margin: 0 8px;
+  flex-shrink: 0;
 }
 .index-search-input-group input {
-  flex-grow: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.95rem;
-  color: #111827;
-  padding: 10px 0;
+  flex: 1; border: none;
+  background: transparent; outline: none;
+  font-size: 0.9rem; color: #212121;
+  padding: 8px 0; min-width: 0;
 }
-.index-search-input-group input::placeholder {
-  color: #9ca3af;
-}
+.index-search-input-group input::placeholder { color: #bbb; }
 .index-search-input-group button {
-  background-color: #2563eb; /* Màu xanh nước biển chủ đạo của Bootstrap */
-  color: #ffffff;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  background: #0d6efd; color: #fff;
+  border: none; padding: 8px 20px;
+  border-radius: 3px;
+  font-weight: 500; font-size: 0.88rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s;
+  white-space: nowrap; flex-shrink: 0;
 }
-.index-search-input-group button:hover {
-  background-color: #1d4ed8; /* Tối màu hơn khi di chuột */
-  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
-}
-/* Hiệu ứng kích hoạt khi người dùng nhấp chuột vào ô nhập liệu */
-.index-search-input-group:focus-within {
-  border-color: #2563eb;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
-}
-
-/* Đảm bảo khoảng cách giao diện mượt mà trên thiết bị di động */
+.index-search-input-group button:hover { background: #0b5ed7; }
 @media (max-width: 576px) {
-  .index-search-divider {
-    padding: 15px 0;
-  }
-  .index-search-input-group {
-    padding: 4px 4px 4px 12px;
-  }
-  .index-search-input-group button {
-    padding: 8px 16px;
-  }
+  .search-category-select { display: none; }
+  .search-vdivider { display: none; }
+  .index-search-input-group button { padding: 6px 14px; font-size: 0.82rem; }
 }
 </style>
+
 
 <!-- TOPBAR -->
 <div class="topbar">
@@ -98,9 +103,6 @@
     <div class="topbar-right">
       <span id="topbar-time"></span>
       <span class="topbar-divider">|</span>
-      <a href="/auth/login">Đăng nhập</a>
-      <span class="topbar-divider">|</span>
-      <a href="/auth/register">Đăng ký</a>
     </div>
   </div>
 </div>
@@ -194,48 +196,213 @@
   </div>
 </section>
 
-<!-- QUICK CATEGORY GRID -->
-<section class="section-categories reveal">
+<!-- POPULAR CATEGORIES - GRID ẢNH KIỂU EPAL/SHOPEE -->
+<section class="section-popcats reveal">
   <div class="container">
-    <div class="section-head">
-      <h2 class="section-title">Danh mục sản phẩm</h2>
+    <div class="section-head-line">
+      <h2>Danh mục nổi bật</h2>
+      <a href="/products" class="see-all-link">Xem tất cả →</a>
     </div>
-    <div class="cat-grid">
-      <a href="/products?category=fish" class="cat-item">
-        <div class="cat-icon-bg" style="background:#e8f5e9">🐠</div>
-        <span>Cá cảnh</span>
+    <div class="popcat-grid">
+
+      <a href="/products?category=fish" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <!-- Thay src bằng ảnh thật sau: /picture/cat-fish.jpg -->
+          <img src="/picture/cat-fish.jpg" alt="Cá cảnh"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#43cea2,#185a9d)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🐠 Cá cảnh</span>
       </a>
-      <a href="/products?category=tank" class="cat-item">
-        <div class="cat-icon-bg" style="background:#e3f2fd">🏘️</div>
-        <span>Bể & Lồng</span>
+
+      <a href="/products?category=tank" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-tank.jpg" alt="Bể & Lồng"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#4facfe,#00f2fe)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🏘️ Bể & Lồng</span>
       </a>
-      <a href="/products?category=hamster" class="cat-item">
-        <div class="cat-icon-bg" style="background:#fff3e0">🐹</div>
-        <span>Hamster</span>
+
+      <a href="/products?category=hamster" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-hamster.jpg" alt="Hamster"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#f7971e,#ffd200)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🐹 Hamster</span>
       </a>
-      <a href="/products?category=reptile" class="cat-item">
-        <div class="cat-icon-bg" style="background:#f3e5f5">🦎</div>
-        <span>Bò sát</span>
+
+      <a href="/products?category=reptile" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-reptile.jpg" alt="Bò sát"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#56ab2f,#a8e063)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🦎 Bò sát</span>
       </a>
-      <a href="/products?category=food" class="cat-item">
-        <div class="cat-icon-bg" style="background:#e8f5e9">🌿</div>
-        <span>Thức ăn</span>
+
+      <a href="/products?category=food" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-food.jpg" alt="Thức ăn"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#11998e,#38ef7d)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🌿 Thức ăn</span>
       </a>
-      <a href="/products?category=medicine" class="cat-item">
-        <div class="cat-icon-bg" style="background:#fce4ec">💊</div>
-        <span>Thuốc</span>
+
+      <a href="/products?category=medicine" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-medicine.jpg" alt="Thuốc & Vitamin"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#f953c6,#b91d73)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">💊 Thuốc & Vitamin</span>
       </a>
-      <a href="/products?category=accessory" class="cat-item">
-        <div class="cat-icon-bg" style="background:#e0f7fa">🎯</div>
-        <span>Phụ kiện</span>
+
+      <a href="/products?category=accessory" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-accessory.jpg" alt="Phụ kiện"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#fc4a1a,#f7b733)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">🎯 Phụ kiện</span>
       </a>
-      <a href="/products?category=clothing" class="cat-item">
-        <div class="cat-icon-bg" style="background:#fff8e1">👗</div>
-        <span>Quần áo</span>
+
+      <a href="/products?category=clothes" class="popcat-card">
+        <div class="popcat-img-wrap">
+          <img src="/picture/cat-clothes.jpg" alt="Quần áo thú cưng"
+               onerror="this.parentNode.style.background='linear-gradient(135deg,#ee9ca7,#ffdde1)'; this.style.display='none'">
+          <div class="popcat-overlay"></div>
+        </div>
+        <span class="popcat-label">👗 Quần áo</span>
       </a>
+
+
     </div>
   </div>
 </section>
+
+<!-- CSS CHO SECTION POPULAR CATEGORIES -->
+<style>
+/* ===== SECTION HEADER ===== */
+.section-head-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+.section-head-line h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a2232;
+  margin: 0;
+  position: relative;
+  padding-left: 14px;
+}
+.section-head-line h2::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 4px; height: 22px;
+  background: #0d6efd;
+  border-radius: 2px;
+}
+.see-all-link {
+  font-size: 0.85rem;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.see-all-link:hover { color: #0b5ed7; text-decoration: underline; }
+
+/* ===== POPULAR CATEGORIES GRID ===== */
+.section-popcats {
+  background: #fff;
+  padding: 32px 0 28px;
+  margin-bottom: 8px;
+  border-bottom: 8px solid #f5f5f5;
+}
+.popcat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+/* ===== CARD TỪNG DANH MỤC ===== */
+.popcat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.22s ease;
+}
+.popcat-card:hover { transform: translateY(-4px); color: #0d6efd; }
+.popcat-img-wrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: box-shadow 0.22s;
+}
+.popcat-card:hover .popcat-img-wrap {
+  box-shadow: 0 6px 20px rgba(13,110,253,0.18);
+}
+.popcat-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+  display: block;
+}
+.popcat-card:hover .popcat-img-wrap img { transform: scale(1.07); }
+.popcat-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.28) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.popcat-card:hover .popcat-overlay { opacity: 1; }
+.popcat-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+}
+/* Card "Xem thêm" đặc biệt */
+.popcat-card--more .popcat-img-wrap {
+  background: linear-gradient(135deg, #1a2232, #2d3e5e);
+}
+.popcat-more-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 300;
+}
+.popcat-card--more:hover .popcat-img-wrap {
+  box-shadow: 0 6px 20px rgba(13,110,253,0.3);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 991px) {
+  .popcat-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+}
+@media (max-width: 767px) {
+  .popcat-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .popcat-label { font-size: 0.72rem; }
+}
+@media (max-width: 480px) {
+  .popcat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+}
+</style>
 
 <!-- PROMO MINI BANNERS -->
 <section class="section-promo reveal">
@@ -301,7 +468,6 @@
   <div class="container">
     <div class="showcase-grid showcase-grid--left">
       <div class="showcase-banner showcase-banner--green">
-        <!-- PLACEHOLDER: thêm background-image: url('/picture/TEN_ANH.jpg') vào .showcase-banner--green trong CSS -->
         <div class="showcase-banner-content">
           <h3>Thế giới cá cảnh</h3>
           <p>Hàng trăm loài cá đẹp từ khắp nơi trên thế giới</p>
@@ -325,7 +491,6 @@
         <div class="skeleton"></div><div class="skeleton"></div>
       </div>
       <div class="showcase-banner showcase-banner--dark">
-        <!-- PLACEHOLDER: thêm background-image: url('/picture/TEN_ANH.jpg') vào .showcase-banner--dark trong CSS -->
         <div class="showcase-banner-content">
           <h3>Bò sát cảnh</h3>
           <p>Rồng Bearded Dragon, Rùa cạn, Tắc kè leo tường</p>

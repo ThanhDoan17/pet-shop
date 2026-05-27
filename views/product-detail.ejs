@@ -1,29 +1,44 @@
 <%- include('partials/header') %>
-<div class="container py-5" style="background-color: #f8f9fa;">
+
+<!-- Thay đổi màu nền tổng thể thành màu xám nhạt đặc trưng của sàn TMĐT -->
+<div class="container py-4" style="background-color: #f5f5f5; font-family: -apple-system, HelveticaNeue, Helvetica, Roboto, Arial, sans-serif;">
   
   <!-- Nút quay lại & Điều hướng nhanh -->
-  <nav aria-label="breadcrumb" class="mb-4">
-    <a href="/products" class="btn btn-sm btn-light border shadow-sm rounded-pill px-3 fw-medium">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <a href="/products" class="btn btn-sm btn-light border-0 bg-white shadow-sm px-3 fw-medium text-secondary" style="font-size: 0.85rem; border-radius: 2px;">
       <i class="bi bi-arrow-left me-1"></i> Quay lại cửa hàng
     </a>
   </nav>
 
-  <!-- KHỐI CHI TIẾT SẢN PHẨM CAO CẤP -->
-  <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 border border-light mb-5">
-    <div class="row g-5">
-      <!-- Vùng ảnh sản phẩm -->
-      <div class="col-12 col-md-5 text-center d-flex align-items-center justify-content-center bg-light rounded-4 overflow-hidden position-relative" style="min-height: 380px;">
-        <img src="<%= product.image %>" alt="<%= product.name %>" class="img-fluid rounded-3 transform-hover" style="max-height: 350px; object-fit: contain; transition: transform 0.3s ease;">
+  <!-- Khối sản phẩm chính với cấu trúc đổ bóng nhẹ và không viền của Shopee -->
+  <div class="bg-white p-3 p-md-4 mb-4" style="border-radius: 3px; box-shadow: 0 1px 1px 0 rgba(0,0,0,.05);">
+    <div class="row g-4">
+      
+      <!-- Vùng trái: Ảnh sản phẩm (Cố định tỷ lệ vuông 1:1 chuẩn thương mại điện tử) -->
+      <div class="col-12 col-md-5">
+        <div class="d-flex flex-column gap-2">
+          <div class="text-center d-flex align-items-center justify-content-center bg-white position-relative" 
+               style="aspect-ratio: 1 / 1; width: 100%; border: 1px solid rgba(0,0,0,.05);">
+            <img src="<%= product.image %>" alt="<%= product.name %>" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+          </div>
+          <!-- Khu vực Thumbnails chạy ngang sẽ bổ sung tại đây nếu cần -->
+        </div>
       </div>
       
-      <!-- Vùng thông tin bán hàng -->
-      <div class="col-12 col-md-7 d-flex flex-column justify-content-between">
-        <div>
-          <h1 class="h2 fw-bold text-dark mb-2" style="letter-spacing: -0.5px;"><%= product.name %></h1>
+      <!-- Vùng phải: Thông tin bán hàng chi tiết -->
+      <div class="col-12 col-md-7 d-flex flex-column justify-content-start">
+        <div class="ps-md-3">
           
-          <!-- Điểm đánh giá sao dựa trên tỉ lệ khách hàng thực tế -->
-          <div class="d-flex align-items-center mb-3 gap-2">
-            <div class="text-warning fs-5">
+          <!-- Tên sản phẩm: Font chữ đứng, giảm kích thước chuẩn chỉnh, không quá to -->
+          <h1 class="fw-medium text-dark mb-2 line-clamp-2" style="font-size: 1.25rem; line-height: 1.4; word-break: break-word; color: #222 !important;">
+            <%= product.name %>
+          </h1>
+          
+          <!-- Thanh chỉ số đánh giá ngang chuẩn Shopee -->
+          <div class="d-flex flex-wrap align-items-center mb-3 gap-3 shopee-rating-bar" style="font-size: 0.875rem;">
+            
+            <!-- Điểm Đánh Giá số -->
+            <div class="d-flex align-items-center gap-1 border-end pe-3" style="border-color: rgba(0,0,0,.1) !important;">
               <% 
                 let avgRating = 0;
                 if (typeof reviews !== 'undefined' && reviews.length > 0) {
@@ -33,90 +48,241 @@
                 let fullStars = Math.floor(avgRating);
                 let hasHalf = avgRating - fullStars >= 0.5;
               %>
-              <% for(let i=1; i<=5; i++) { %>
-                <% if(i <= fullStars) { %>
-                  <i class="bi bi-star-fill"></i>
-                <% } else if(i === fullStars + 1 && hasHalf) { %>
-                  <i class="bi bi-star-half"></i>
-                <% } else { %>
-                  <i class="bi bi-star"></i>
+              <span class="fw-medium text-danger border-bottom border-danger border-1" style="color: #077416 !important; border-color: #ee4d2d !important;"><%= avgRating > 0 ? avgRating : '0.0' %></span>
+              <div class="small ms-1" style="color: #077416;">
+                <% for(let i=1; i<=5; i++) { %>
+                  <% if(i <= fullStars) { %>
+                    <i class="bi bi-star-fill"></i>
+                  <% } else if(i === fullStars + 1 && hasHalf) { %>
+                    <i class="bi bi-star-half"></i>
+                  <% } else { %>
+                    <i class="bi bi-star"></i>
+                  <% } %>
                 <% } %>
-              <% } %>
+              </div>
             </div>
-            <span class="fw-bold text-dark pt-1"><%= avgRating > 0 ? avgRating : 'Chưa có' %></span>
-            <span class="text-muted pt-1">|</span>
-            <span class="text-secondary pt-1" style="font-size: 0.9rem;">(<%= typeof reviews !== 'undefined' ? reviews.length : 0 %> đánh giá từ khách hàng)</span>
+            
+            <!-- Số lượng Đánh Giá văn bản -->
+            <div class="border-end pe-3 text-dark" style="border-color: rgba(0,0,0,.1) !important;">
+              <span class="fw-medium border-bottom border-dark border-1" style="color: #222;"><%= typeof reviews !== 'undefined' ? reviews.length : 0 %></span>
+              <span class="text-muted small ms-1">Đánh Giá</span>
+            </div>
+
+            <!-- Số lượng Đã Bán -->
+            <div class="text-dark">
+              <span class="fw-medium" style="color: #222;">0</span>
+              <span class="text-muted small ms-1">Đã Bán</span>
+            </div>
           </div>
 
-          <!-- Khối hiển thị giá tiền -->
-          <div class="p-3 bg-light rounded-3 my-4 d-inline-block w-100">
-            <span class="text-muted small d-block mb-1">Giá bán hiện tại</span>
-            <span class="fs-1 fw-extrabold text-danger m-0"><%= product.price.toLocaleString('vi-VN') %> <span style="font-size: 1.2rem; vertical-align: middle;">đ</span></span>
+          <!-- Khối hiển thị giá tiền bản rộng đặc trưng với nền xám rất nhạt -->
+          <div class="p-3 w-100 d-flex align-items-center mb-4" style="background-color: #fafafa; border-radius: 2px;">
+            <span class="fw-medium m-0" style="color: #077416; font-size: 1.875rem;">
+              <span class="fw-normal style-currency" style="font-size: 1.25rem; vertical-align: super; margin-right: 2px;">đ</span><%= product.price.toLocaleString('vi-VN') %>
+            </span>
           </div>
 
-          <!-- Sửa lỗi: Hiển thị mô tả dãn cách đẹp mắt và hỗ trợ xuống dòng tự nhiên -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-secondary text-uppercase small mb-2">Mô tả chi tiết sản phẩm</h6>
-            <div class="text-dark border-start border-3 border-primary ps-3 my-2" style="white-space: pre-line; line-height: 1.6; font-size: 0.98rem; text-align: justify;">
-              <%= product.description %>
+                    <!-- Vận chuyển chuẩn phong cách Shopee với text thụt lề đều -->
+          <div class="d-flex align-items-start gap-3 mb-4 py-1" style="font-size: 0.875rem;">
+            <div class="text-secondary" style="width: 110px; min-width: 110px;">Vận Chuyển</div>
+            <div class="d-flex flex-column gap-2 text-dark">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-truck" style="color: #00bfa5; font-size: 1.1rem;"></i>
+                <span class="fw-medium" style="color: #222;">Miễn phí vận chuyển</span>
+              </div>
+              <div class="text-muted" style="font-size: 0.8rem; padding-left: 26px;">
+                Miễn phí vận chuyển cho đơn hàng từ 50.000 đ
+              </div>
             </div>
           </div>
         </div>
 
-        <div>
-          <!-- Trạng thái kho hàng -->
-          <div class="mb-3">
-            <% if (product.stock > 0) { %>
-              <span class="badge bg-success-subtle text-success border border-success px-3 py-2 rounded-pill"><i class="bi bi-check-circle-fill me-1"></i> Còn <%= product.stock %> sản phẩm khả dụng</span>
-            <% } else { %>
-              <span class="badge bg-danger-subtle text-danger border border-danger px-3 py-2 rounded-pill"><i class="bi bi-x-circle-fill me-1"></i> Tạm hết hàng</span>
-            <% } %>
-          </div>
-
-          <!-- Form đặt hàng chuyên nghiệp -->
+        <!-- Khung tương tác đặt hàng tích hợp số lượng và nút bấm song song -->
+        <div class="ps-md-3 mt-2">
           <% if (product.stock > 0) { %>
-            <form method="POST" action="/cart/add" class="d-flex flex-wrap gap-3 align-items-center mt-3">
+            <form method="POST" action="/cart/add" class="d-flex flex-column gap-4">
               <input type="hidden" name="productId" value="<%= product._id %>">
-              <div class="input-group border rounded-3" style="width: 130px; height: 46px;">
-                <button type="button" class="btn btn-link text-dark text-decoration-none px-2 border-end" onclick="this.parentNode.querySelector('input[type=number]').stepDown()"><i class="bi bi-dash-lg"></i></button>
-                <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>" class="form-control border-0 text-center bg-transparent fw-bold text-dark" required>
-                <button type="button" class="btn btn-link text-dark text-decoration-none px-2 border-start" onclick="this.parentNode.querySelector('input[type=number]').stepUp()"><i class="bi bi-plus-lg"></i></button>
+              
+              <!-- Dòng chọn số lượng dẹt phẳng chuẩn UI Shopee -->
+              <div class="d-flex align-items-center gap-3" style="font-size: 0.875rem;">
+                <div class="text-secondary" style="width: 110px; min-width: 110px;">Số Lượng</div>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                  <div class="input-group border d-flex align-items-center bg-white" style="width: 120px; height: 32px; border-color: rgba(0,0,0,.09) !important; border-radius: 2px;">
+                    <button type="button" class="btn btn-light bg-transparent border-0 text-secondary px-2 d-flex align-items-center justify-content-center h-100 style-btn-qty" style="font-size: 0.75rem; width: 32px;" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                      <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>" class="form-control border-start border-end border-0 text-center bg-transparent fw-normal p-0 text-dark h-100 shadow-none" style="font-size: 0.9rem; border-color: rgba(0,0,0,.09) !important; color: #222 !important;" required>
+                    <button type="button" class="btn btn-light bg-transparent border-0 text-secondary px-2 d-flex align-items-center justify-content-center h-100 style-btn-qty" style="font-size: 0.75rem; width: 32px;" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                  <span class="text-secondary" style="font-size: 0.875rem;"><%= product.stock %> sản phẩm có sẵn</span>
+                </div>
               </div>
-              <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm flex-grow-1 flex-md-grow-0" style="height: 46px;"><i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng</button>
+
+              <!-- Cặp nút bấm hành động Thêm vào giỏ & Mua ngay phẳng, màu sắc chuẩn sàn -->
+              <div class="d-flex flex-wrap gap-3 mt-2">
+                <button type="submit" class="btn px-4 fw-normal d-flex align-items-center justify-content-center gap-2" 
+                        style="height: 48px; min-width: 210px; background-color: rgba(255, 87, 34, 0.1); border: 1px solid #ee4d2d; color: #077416; border-radius: 2px; font-size: 0.95rem;">
+                  <i class="bi bi-cart-plus" style="font-size: 1.2rem;"></i> Thêm Vào Giỏ Hàng
+                </button>
+                <button type="submit" formaction="/cart/buy-now" class="btn btn-danger px-4 fw-normal d-flex align-items-center justify-content-center flex-grow-1 flex-md-grow-0" 
+                        style="height: 48px; min-width: 180px; background-color: #077416; border: none; border-radius: 2px; font-size: 0.95rem;">
+                  Mua Ngay
+                </button>
+              </div>
+
+              <!-- MÔ TẢ CHI TIẾT SẢN PHẨM - CO GỌN + XEM THÊM -->
+<div class="product-desc-section">
+  <div class="section-title-shopee">Mô Tả Sản Phẩm</div>
+
+  <div class="desc-collapse-wrap" id="descWrap">
+    <div class="product-desc-text" id="descText">
+      <%= product.description %>
+    </div>
+    <!-- Gradient mờ dần cuối -->
+    <div class="desc-fade" id="descFade"></div>
+  </div>
+
+  <button class="desc-toggle-btn" id="descToggleBtn" onclick="toggleDesc()">
+    <span id="descBtnLabel">Xem thêm</span>
+    <i class="bi bi-chevron-down" id="descBtnIcon"></i>
+  </button>
+</div>
+
+<style>
+/* ===== MÔ TẢ CO GỌN ===== */
+.desc-collapse-wrap {
+  position: relative;
+  max-height: 120px;        /* Chiều cao co gọn */
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.desc-collapse-wrap.expanded {
+  max-height: 2000px;       /* Mở rộng tối đa */
+}
+.desc-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(transparent, #fff);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.desc-collapse-wrap.expanded .desc-fade {
+  opacity: 0;
+}
+.desc-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  color: #ee4d2d;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.desc-toggle-btn:hover { background: #fff2ee; }
+#descBtnIcon { transition: transform 0.3s; font-size: 0.8rem; }
+.expanded-btn #descBtnIcon { transform: rotate(180deg); }
+</style>
+
+<script>
+function toggleDesc() {
+  const wrap = document.getElementById('descWrap');
+  const btn  = document.getElementById('descToggleBtn');
+  const label = document.getElementById('descBtnLabel');
+  const icon  = document.getElementById('descBtnIcon');
+
+  const isExpanded = wrap.classList.toggle('expanded');
+  btn.classList.toggle('expanded-btn', isExpanded);
+  label.textContent = isExpanded ? 'Thu gọn' : 'Xem thêm';
+}
+</script>
             </form>
+          <% } else { %>
+            <div class="p-3 bg-light rounded-1 text-muted text-center border-0 mb-2" style="background-color: #fff8f7 !important; color: #ff5722 !important; border: 1px solid #f9dad6 !important; border-radius: 2px;">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>Sản phẩm hiện tại đã hết hàng. Vui lòng quay lại sau!
+            </div>
           <% } %>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- THANH CUỐN NGANG SẢN PHẨM LIÊN QUAN -->
-  <div class="mb-5">
+  <!-- THANH CUỐN NGANG SẢN PHẨM LIÊN QUAN (Chuẩn Grid/Flex bo mờ Shopee) -->
+  <div class="mb-4">
     <div class="d-flex justify-content-between align-items-end mb-3">
-      <h3 class="fw-bold m-0" style="font-size: 1.4rem;"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Sản phẩm liên quan</h3>
-      <span class="text-muted small">Kéo ngang để xem <i class="bi bi-arrow-right-short"></i></span>
+      <!-- Tiêu đề in hoa nhẹ, màu xám đậm đặc trưng của mục Gợi ý -->
+      <h3 class="fw-medium m-0 text-uppercase" style="font-size: 1rem; color: #888; letter-spacing: 0.5px;">
+        <i class="bi bi-grid-3x3-gap-fill me-2" style="color: #ee4d2d;"></i>Sản phẩm liên quan
+      </h3>
+      <span class="text-secondary small d-md-none">Kéo ngang để xem <i class="bi bi-arrow-right-short"></i></span>
     </div>
     
-    <div class="d-flex overflow-x-auto gap-3 pb-3 scrollbar-hidden" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
+    <!-- Container cuộn mượt mà trên Mobile và co giãn dạng Grid trên Desktop -->
+    <div class="d-flex overflow-x-auto gap-2 pb-2 scrollbar-hidden" style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
       <% if (typeof relatedProducts !== 'undefined' && relatedProducts.length > 0) { %>
         <% relatedProducts.forEach(item => { %>
-          <div class="bg-white rounded-3 p-3 border shadow-sm d-flex flex-column justify-content-between flex-shrink-0" style="width: 220px; scroll-snap-align: start;">
-            <a href="/products/<%= item._id %>" class="text-center d-block mb-2 overflow-hidden rounded-2" style="height: 150px;">
-              <img src="<%= item.image %>" alt="<%= item.name %>" class="w-100 h-100 object-fit-cover transition-all">
+          <!-- Thẻ sản phẩm: Viền cực mảnh, đổ bóng nhẹ khi hover, không bo góc tròn sâu -->
+          <div class="bg-white p-2 d-flex flex-column justify-content-between flex-shrink-0 style-product-card" 
+               style="width: 190px; scroll-snap-align: start; border: 1px solid rgba(0,0,0,.05); border-radius: 2px; transition: transform 0.1s ease, box-shadow 0.1s ease;">
+            <a href="/products/<%= item._id %>" class="text-center d-block mb-2 overflow-hidden bg-light position-relative" style="aspect-ratio: 1 / 1; width: 100%;">
+              <img src="<%= item.image %>" alt="<%= item.name %>" class="w-100 h-100" style="object-fit: contain;">
             </a>
-            <div>
-              <div class="fw-semibold text-dark text-truncate mb-1" style="font-size: 0.9rem;"><%= item.name %></div>
-              <div class="text-danger fw-bold small"><%= item.price.toLocaleString('vi-VN') %> đ</div>
+            <div class="px-1 flex-grow-1 d-flex flex-column justify-content-between">
+              <!-- Tên sản phẩm Shopee: Chữ thường, thu gọn 2 dòng -->
+              <div class="text-dark mb-2 text-wrap" style="font-size: 0.8rem; line-height: 1.3; height: 2.6rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #222 !important;">
+                <%= item.name %>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-auto pt-1">
+                <div class="fw-medium" style="color: #ee4d2d; font-size: 0.95rem;">
+                  <span style="font-size: 0.75rem; vertical-align: super;">đ</span><%= item.price.toLocaleString('vi-VN') %>
+                </div>
+                <span class="text-muted" style="font-size: 0.7rem;">Đã bán 0</span>
+              </div>
             </div>
-            <a href="/products/<%= item._id %>" class="btn btn-outline-dark btn-sm w-100 mt-2 rounded-2 py-1" style="font-size: 0.8rem;">Xem mẫu</a>
           </div>
         <% }) %>
       <% } else { %>
-        <!-- Mockup dự phòng nếu Controller chưa kịp truyền dữ liệu liên quan -->
-        <div class="text-muted py-3 ps-2 small">Đang tìm các sản phẩm cùng danh mục tương tự...</div>
+        <div class="text-secondary py-3 ps-2" style="font-size: 0.85rem;">Đang tìm các sản phẩm cùng danh mục tương tự...</div>
       <% } %>
     </div>
   </div>
+
+  <!-- Thêm một đoạn CSS bổ sung để tối ưu trải nghiệm cuộn và hiệu ứng hover -->
+  <style>
+    .scrollbar-hidden::-webkit-scrollbar { display: none; }
+    .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+    .style-btn-qty:hover { background-color: rgba(0,0,0,.02) !important; }
+    .style-product-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 12px rgba(0,0,0,.1);
+      border-color: #ee4d2d !important;
+    }
+
+    body {
+  overflow-x: hidden !important;
+}
+/* Đảm bảo footer luôn full width */
+footer, .footer, [class*="footer"] {
+  width: 100vw !important;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw !important;
+  margin-right: -50vw !important;
+}
+  </style>
+
 
   <!-- KHUNG TRÒ CHUYỆN / ĐÁNH GIÁ SẢN PHẨM TRỰC TIẾP -->
   <div class="row g-4">
@@ -261,3 +427,4 @@ class="align-items-center justify-content-center text-white fw-bold shadow-sm fl
   .rating-input label { color: #e4e4e4; transition: color 0.2s; }
 </style>
 <%- include('partials/footer') %>
+

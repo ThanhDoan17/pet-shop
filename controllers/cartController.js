@@ -71,3 +71,37 @@ exports.removeFromCart = async (req, res) => {
   await saveCartToDB(req);
   res.redirect('/cart');
 };
+
+exports.buyNow = async (req, res) => {
+  if (req.session.user && req.session.user.role !== 'user') return res.redirect('/');
+  const Product = require('../models/Product');
+  try {
+    const { productId, quantity } = req.body;
+    const qty = parseInt(quantity) || 1;
+    const product = await Product.findById(productId);
+    if (!product) return res.redirect('/products');
+
+    if (!req.session.cart) req.session.cart = [];
+
+    const existingIndex = req.session.cart.findIndex(i => i.productId === productId);
+    if (existingIndex >= 0) {
+      req.session.cart[existingIndex].quantity += qty;
+    } else {
+      req.session.cart.push({
+        productId,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: qty
+      });
+    }
+
+    await saveCartToDB(req);
+
+    // Khác addToCart duy nhất ở chỗ này: redirect thẳng checkout
+    res.redirect('/orders/checkout');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/products');
+  }
+};

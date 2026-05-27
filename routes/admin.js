@@ -24,6 +24,10 @@ router.get('/statistics', adminController.getStatistics);
 router.get('/orders', adminController.getOrders);
 router.post('/orders/:id/status', adminController.updateOrderStatus);
 
+router.get('/reviews', adminController.getReviews);
+router.post('/reviews/:reviewId/reply', adminController.postAdminReply);
+router.post('/reviews/:reviewId/delete-reply', adminController.deleteAdminReply);
+
 router.get('/users', adminController.getUsers);
 router.post('/users/:id/role', adminController.updateUserRole);
 router.post('/users/:id/delete', adminController.deleteUser);

@@ -244,3 +244,56 @@ exports.deleteUser = async (req, res) => {
     res.redirect('/admin/users');
   }
 };
+
+// Trang quản lý phản hồi đánh giá
+exports.getReviews = async (req, res) => {
+  try {
+    const Review = require('../models/Review');
+    const { search } = req.query;
+    let filter = {};
+    if (search) filter.comment = { $regex: search, $options: 'i' };
+
+    const reviews = await Review.find(filter)
+      .populate('productId', 'name image')
+      .sort({ createdAt: -1 });
+
+    res.render('admin/reviews', { title: 'Quan ly phan hoi', reviews, search: search || '' });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+};
+
+// Xử lý phản hồi từ trang admin
+exports.postAdminReply = async (req, res) => {
+  try {
+    const Review = require('../models/Review');
+    const { reviewId } = req.params;
+    const { reply } = req.body;
+    const currentUser = req.session.user;
+
+    await Review.findByIdAndUpdate(reviewId, {
+      reply: reply.trim(),
+      replyAt: new Date(),
+      replyBy: currentUser.name
+    });
+
+    res.redirect('/admin/reviews');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/reviews');
+  }
+};
+
+// Xóa phản hồi từ trang admin
+exports.deleteAdminReply = async (req, res) => {
+  try {
+    const Review = require('../models/Review');
+    await Review.findByIdAndUpdate(req.params.reviewId, {
+      reply: '', replyAt: null, replyBy: ''
+    });
+    res.redirect('/admin/reviews');
+  } catch (err) {
+    res.redirect('/admin/reviews');
+  }
+};

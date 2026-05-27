@@ -1,0 +1,102 @@
+<%- include('../partials/header') %>
+<div class="container py-4">
+  <h2 class="section-title"><i class="bi bi-chat-square-text"></i> Quản lý phản hồi đánh giá</h2>
+
+  <div class="mb-3">
+    <a href="/admin" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="/admin/products" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-box"></i> Sản phẩm</a>
+    <a href="/admin/orders" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bag"></i> Đơn hàng</a>
+    <a href="/admin/users" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-people"></i> Người dùng</a>
+    <a href="/admin/statistics" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart"></i> Thống kê</a>
+  </div>
+
+  <!-- Tìm kiếm -->
+  <form method="GET" action="/admin/reviews" class="mb-4">
+    <div class="input-group" style="max-width:400px">
+      <input type="text" name="search" value="<%= search %>" class="form-control" placeholder="🔍 Tìm theo nội dung bình luận...">
+      <button class="btn btn-primary">Tìm</button>
+      <% if (search) { %><a href="/admin/reviews" class="btn btn-outline-secondary">Xóa</a><% } %>
+    </div>
+  </form>
+
+  <% if (reviews.length === 0) { %>
+    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+      <div class="fs-1">💬</div>
+      <h4 class="text-muted mt-3">Chưa có đánh giá nào</h4>
+    </div>
+  <% } else { %>
+    <div class="d-flex flex-column gap-3">
+      <% reviews.forEach(r => { %>
+      <div class="bg-white rounded-3 shadow-sm p-4">
+        <!-- Thông tin sản phẩm -->
+        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+          <% if (r.productId) { %>
+            <img src="<%= r.productId.image %>" width="48" height="48" style="object-fit:contain;border-radius:8px;background:#f8f9fa;padding:4px">
+            <div>
+              <div class="fw-bold text-dark small"><%= r.productId.name %></div>
+              <a href="/products/<%= r.productId._id %>" target="_blank" class="text-muted" style="font-size:.78rem;">Xem sản phẩm →</a>
+            </div>
+          <% } else { %>
+            <div class="text-muted small">Sản phẩm đã bị xóa</div>
+          <% } %>
+          <div class="ms-auto text-muted" style="font-size:.78rem;"><%= new Date(r.createdAt).toLocaleDateString('vi-VN') %></div>
+        </div>
+
+        <!-- Nội dung đánh giá -->
+        <div class="d-flex gap-3 mb-3">
+          <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0" style="width:38px;height:38px;font-size:.85rem;">
+            <%= r.userName ? r.userName.charAt(0).toUpperCase() : 'U' %>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="fw-bold text-dark" style="font-size:.9rem;"><%= r.userName %></span>
+              <% if (r.userRole === 'admin') { %><span class="badge bg-danger" style="font-size:.65rem;">Admin</span><% } %>
+              <% if (r.userRole === 'staff') { %><span class="badge bg-primary" style="font-size:.65rem;">Nhân viên</span><% } %>
+              <% if (r.rating > 0) { %>
+                <div class="text-warning" style="font-size:.8rem;">
+                  <% for(let s=1; s<=5; s++) { %><i class="bi bi-star<%= s <= r.rating ? '-fill' : '' %>"></i><% } %>
+                </div>
+              <% } %>
+            </div>
+            <p class="text-secondary mb-0" style="font-size:.9rem;line-height:1.5"><%= r.comment %></p>
+          </div>
+        </div>
+
+        <!-- Phản hồi hiện tại -->
+        <% if (r.reply) { %>
+          <div class="bg-success-subtle border border-success-subtle rounded-3 p-3 mb-3 ms-5">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="fw-bold text-success" style="font-size:.85rem;">
+                <i class="bi bi-reply-fill me-1"></i><%= r.replyBy %>
+                <span class="badge bg-success ms-1" style="font-size:.6rem;">Đã phản hồi</span>
+              </span>
+              <span class="text-muted" style="font-size:.75rem;"><%= r.replyAt ? new Date(r.replyAt).toLocaleDateString('vi-VN') : '' %></span>
+            </div>
+            <p class="text-dark mb-2" style="font-size:.88rem;line-height:1.5"><%= r.reply %></p>
+            <form method="POST" action="/admin/reviews/<%= r._id %>/delete-reply" class="d-inline">
+              <button class="btn btn-outline-danger btn-sm" onclick="return confirm('Xóa phản hồi này?')">
+                <i class="bi bi-trash"></i> Xóa phản hồi
+              </button>
+            </form>
+          </div>
+        <% } %>
+
+        <!-- Form phản hồi -->
+        <div class="ms-5">
+          <form method="POST" action="/admin/reviews/<%= r._id %>/reply">
+            <div class="d-flex gap-2">
+              <input type="text" name="reply" class="form-control form-control-sm rounded-pill"
+                placeholder="<%= r.reply ? 'Cập nhật phản hồi...' : 'Nhập phản hồi của bạn...' %>"
+                value="<%= r.reply || '' %>" required>
+              <button type="submit" class="btn btn-success btn-sm rounded-pill px-3" style="white-space:nowrap">
+                <i class="bi bi-reply"></i> <%= r.reply ? 'Cập nhật' : 'Gửi' %>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

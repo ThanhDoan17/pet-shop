@@ -23,16 +23,129 @@
               <input type="text" name="phone" class="form-control form-control-lg" placeholder="Nhập số điện thoại di động..." required>
             </div>
             
-            <!-- Hàng 2: Địa chỉ cụ thể và Thành phố -->
-            <div class="col-md-8">
-              <label class="form-label fw-600">Địa chỉ giao hàng <span class="text-danger">*</span></label>
-              <input type="text" name="address" class="form-control form-control-lg" placeholder="Số nhà, ngõ ngách, tên đường..." required>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-600">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-              <input type="text" name="city" class="form-control form-control-lg" placeholder="Ví dụ: Hà Nội, TP.HCM..." required>
-            </div>
-            
+            <!-- Hàng 2: Địa chỉ cascade 3 cấp -->
+<div class="col-12">
+  <label class="form-label fw-600">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+  <input type="text" name="address" class="form-control form-control-lg"
+    placeholder="Số nhà, ngõ ngách, tên đường..." required>
+</div>
+
+<!-- 3 dropdown cascade -->
+<div class="col-md-4">
+  <label class="form-label fw-600">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+  <select id="sel-province" name="province" class="form-select form-select-lg" required>
+    <option value="">-- Chọn Tỉnh / Thành phố --</option>
+  </select>
+</div>
+<div class="col-md-4">
+  <label class="form-label fw-600">Quận / Huyện <span class="text-danger">*</span></label>
+  <select id="sel-district" name="district" class="form-select form-select-lg" required disabled>
+    <option value="">-- Chọn Quận / Huyện --</option>
+  </select>
+</div>
+<div class="col-md-4">
+  <label class="form-label fw-600">Phường / Xã <span class="text-danger">*</span></label>
+  <select id="sel-ward" name="ward" class="form-select form-select-lg" required disabled>
+    <option value="">-- Chọn Phường / Xã --</option>
+  </select>
+</div>
+
+<!-- Hidden field ghép địa chỉ đầy đủ gửi lên server -->
+<input type="hidden" name="city" id="full-address-city">
+
+<!-- Script cascade địa chính -->
+<script>
+(function () {
+  const BASE = 'https://provinces.open-api.vn/api';
+  const selP = document.getElementById('sel-province');
+  const selD = document.getElementById('sel-district');
+  const selW = document.getElementById('sel-ward');
+  const hidCity = document.getElementById('full-address-city');
+
+  /* Loading spinner option */
+  function loadingOpt() {
+    return '<option value="">Đang tải...</option>';
+  }
+
+  /* 1. Load tỉnh/thành khi trang mở */
+  fetch(`${BASE}/?depth=1`)
+    .then(r => r.json())
+    .then(data => {
+      data.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+      data.forEach(p => {
+        selP.insertAdjacentHTML('beforeend',
+          `<option value="${p.code}" data-name="${p.name}">${p.name}</option>`);
+      });
+    })
+    .catch(() => {
+      selP.insertAdjacentHTML('beforeend',
+        '<option disabled>Không tải được dữ liệu</option>');
+    });
+
+  /* 2. Khi chọn tỉnh → load huyện */
+  selP.addEventListener('change', function () {
+    const code = this.value;
+    const name = this.options[this.selectedIndex]?.dataset.name || '';
+
+    // Reset huyện và xã
+    selD.innerHTML = loadingOpt();
+    selD.disabled = true;
+    selW.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+    selW.disabled = true;
+    hidCity.value = '';
+
+    if (!code) return;
+
+    fetch(`${BASE}/p/${code}?depth=2`)
+      .then(r => r.json())
+      .then(data => {
+        selD.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+        data.districts
+          .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
+          .forEach(d => {
+            selD.insertAdjacentHTML('beforeend',
+              `<option value="${d.code}" data-name="${d.name}">${d.name}</option>`);
+          });
+        selD.disabled = false;
+        hidCity.value = name; // Tạm lưu tỉnh
+      });
+  });
+
+  /* 3. Khi chọn huyện → load xã */
+  selD.addEventListener('change', function () {
+    const code = this.value;
+    const dName = this.options[this.selectedIndex]?.dataset.name || '';
+    const pName = selP.options[selP.selectedIndex]?.dataset.name || '';
+
+    selW.innerHTML = loadingOpt();
+    selW.disabled = true;
+    hidCity.value = `${dName}, ${pName}`;
+
+    if (!code) return;
+
+    fetch(`${BASE}/d/${code}?depth=2`)
+      .then(r => r.json())
+      .then(data => {
+        selW.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+        data.wards
+          .sort((a, b) => a.name.localeCompare(b.name, 'vi'))
+          .forEach(w => {
+            selW.insertAdjacentHTML('beforeend',
+              `<option value="${w.code}" data-name="${w.name}">${w.name}</option>`);
+          });
+        selW.disabled = false;
+      });
+  });
+
+  /* 4. Khi chọn xã → cập nhật hidden field đầy đủ */
+  selW.addEventListener('change', function () {
+    const wName = this.options[this.selectedIndex]?.dataset.name || '';
+    const dName = selD.options[selD.selectedIndex]?.dataset.name || '';
+    const pName = selP.options[selP.selectedIndex]?.dataset.name || '';
+    hidCity.value = `${wName}, ${dName}, ${pName}`;
+  });
+})();
+</script>
             <!-- Hàng 3: Phương thức thanh toán và Ghi chú -->
             <div class="col-md-5">
               <label class="form-label fw-600">Phương thức thanh toán <span class="text-danger">*</span></label>

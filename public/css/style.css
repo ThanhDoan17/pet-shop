@@ -1,8 +1,3 @@
-/* =============================================
-   PESTSHOP — PREMIUM ECOMMERCE CSS
-   ============================================= */
-
-/* ===== GLOBAL ===== */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap');
 
 :root {
@@ -10,7 +5,7 @@
   --green-dark: #27ae60;
   --green-dim:  #e8f5e9;
   --orange:     #e67e22;
-  --red:        #e74c3c;
+  --red:        rgb(78, 97, 86);
   --dark:       #1a1a2e;
   --dark-2:     #16213e;
   --gray-1:     #f8f9fa;
@@ -266,8 +261,21 @@ img { display: block; max-width: 100%; }
 
 /* ===== CATEGORY ===== */
 .section-categories { padding: 56px 0 40px; background: var(--white); }
-.cat-grid { display: grid; grid-template-columns: repeat(8,1fr); gap: 12px; }
-.cat-item {
+.popcat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px 20px;
+  max-width: 100%;
+}
+
+/* Hàng 2 chỉ có 3 item + 1 card "Xem thêm" → căn giữa đều */
+.popcat-grid .popcat-card:nth-child(6),
+.popcat-grid .popcat-card:nth-child(7),
+.popcat-grid .popcat-card:nth-child(8),
+.popcat-grid .popcat-card:nth-child(9),
+.popcat-grid .popcat-card:nth-child(10) {
+  /* Đẩy hàng 2 bắt đầu từ cột 1 */
+}.cat-item {
   display: flex; flex-direction: column; align-items: center;
   gap: 10px; color: var(--text); font-size: .8rem; font-weight: 600;
   transition: transform var(--transition); padding: 8px; border-radius: var(--radius);
@@ -707,3 +715,23 @@ footer { margin-top: auto; }
   .row.g-3 { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
+/* Trải rộng container section danh mục */
+.section-popcats .container {
+  max-width: 1200px !important;
+}
+
+/* Tăng gap và ảnh to hơn */
+.popcat-grid {
+  grid-template-columns: repeat(5, 1fr) !important;
+  gap: 18px 24px !important;
+}
+
+.popcat-img-wrap {
+  border-radius: 8px !important;
+  aspect-ratio: 4 / 3 !important;  /* Ngang hơn thay vì vuông */
+}
+
+.popcat-label {
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+}
