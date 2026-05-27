@@ -120,7 +120,7 @@
                 </div>
               </div>
 
-              <!-- Cặp nút bấm hành động Thêm vào giỏ & Mua ngay phẳng, màu sắc chuẩn sàn -->
+              <!-- Cặp nút bấm hành động -->
               <div class="d-flex flex-wrap gap-3 mt-2">
                 <button type="submit" class="btn px-4 fw-normal d-flex align-items-center justify-content-center gap-2" 
                         style="height: 48px; min-width: 210px; background-color: rgba(255, 87, 34, 0.1); border: 1px solid #ee4d2d; color: #077416; border-radius: 2px; font-size: 0.95rem;">
@@ -132,35 +132,42 @@
                 </button>
               </div>
 
-              <!-- MÔ TẢ CHI TIẾT SẢN PHẨM - CO GỌN + XEM THÊM -->
+            </form>
+            <!-- ↑ ĐÓNG FORM TẠI ĐÂY — mô tả nằm NGOÀI form -->
+
+          <% } else { %>
+            <div class="p-3 bg-light rounded-1 text-muted text-center border-0 mb-2" style="background-color: #fff8f7 !important; color: #ff5722 !important; border: 1px solid #f9dad6 !important; border-radius: 2px;">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>Sản phẩm hiện tại đã hết hàng. Vui lòng quay lại sau!
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- MÔ TẢ CHI TIẾT SẢN PHẨM - NẰM HOÀN TOÀN NGOÀI FORM -->
 <div class="product-desc-section">
   <div class="section-title-shopee">Mô Tả Sản Phẩm</div>
-
   <div class="desc-collapse-wrap" id="descWrap">
     <div class="product-desc-text" id="descText">
       <%= product.description %>
     </div>
-    <!-- Gradient mờ dần cuối -->
     <div class="desc-fade" id="descFade"></div>
   </div>
-
-  <button class="desc-toggle-btn" id="descToggleBtn" onclick="toggleDesc()">
+  <button type="button" class="desc-toggle-btn" id="descToggleBtn" onclick="toggleDesc()">
     <span id="descBtnLabel">Xem thêm</span>
     <i class="bi bi-chevron-down" id="descBtnIcon"></i>
   </button>
 </div>
 
 <style>
-/* ===== MÔ TẢ CO GỌN ===== */
 .desc-collapse-wrap {
   position: relative;
-  max-height: 120px;        /* Chiều cao co gọn */
+  max-height: 120px;
   overflow: hidden;
   transition: max-height 0.4s ease;
 }
-.desc-collapse-wrap.expanded {
-  max-height: 2000px;       /* Mở rộng tối đa */
-}
+.desc-collapse-wrap.expanded { max-height: 2000px; }
 .desc-fade {
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -169,9 +176,7 @@
   pointer-events: none;
   transition: opacity 0.3s;
 }
-.desc-collapse-wrap.expanded .desc-fade {
-  opacity: 0;
-}
+.desc-collapse-wrap.expanded .desc-fade { opacity: 0; }
 .desc-toggle-btn {
   display: flex;
   align-items: center;
@@ -196,27 +201,14 @@
 
 <script>
 function toggleDesc() {
-  const wrap = document.getElementById('descWrap');
-  const btn  = document.getElementById('descToggleBtn');
+  const wrap  = document.getElementById('descWrap');
+  const btn   = document.getElementById('descToggleBtn');
   const label = document.getElementById('descBtnLabel');
-  const icon  = document.getElementById('descBtnIcon');
-
   const isExpanded = wrap.classList.toggle('expanded');
   btn.classList.toggle('expanded-btn', isExpanded);
   label.textContent = isExpanded ? 'Thu gọn' : 'Xem thêm';
 }
 </script>
-            </form>
-          <% } else { %>
-            <div class="p-3 bg-light rounded-1 text-muted text-center border-0 mb-2" style="background-color: #fff8f7 !important; color: #ff5722 !important; border: 1px solid #f9dad6 !important; border-radius: 2px;">
-              <i class="bi bi-exclamation-triangle-fill me-2"></i>Sản phẩm hiện tại đã hết hàng. Vui lòng quay lại sau!
-            </div>
-          <% } %>
-        </div>
-
-      </div>
-    </div>
-  </div>
 
   <!-- THANH CUỐN NGANG SẢN PHẨM LIÊN QUAN (Chuẩn Grid/Flex bo mờ Shopee) -->
   <div class="mb-4">
