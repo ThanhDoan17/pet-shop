@@ -145,69 +145,86 @@
     </div>
   </div>
 
-<!-- MÔ TẢ CHI TIẾT SẢN PHẨM - NẰM HOÀN TOÀN NGOÀI FORM -->
-<div class="product-desc-section">
-  <div class="section-title-shopee">Mô Tả Sản Phẩm</div>
-  <div class="desc-collapse-wrap" id="descWrap">
-    <div class="product-desc-text" id="descText">
+<!-- MÔ TẢ SẢN PHẨM - CO GỌN + SCROLLBOX -->
+<div class="product-desc-section" style="background:#fff; border-radius:4px; box-shadow:0 1px 4px rgba(0,0,0,0.08); padding:20px 24px; margin-bottom:12px;">
+  <div style="font-size:1rem; font-weight:500; color:#333; text-transform:uppercase; letter-spacing:0.3px; padding-bottom:12px; border-bottom:1px solid #e8e8e8; margin-bottom:12px;">
+    Mô Tả Sản Phẩm
+  </div>
+
+  <!-- PREVIEW: luôn hiện 3 dòng đầu -->
+  <div id="descPreview" style="font-size:0.88rem; color:#555; line-height:1.8; white-space:pre-line; display:block;">
+    <%= product.description ? product.description.substring(0, 200) : '' %><% if(product.description && product.description.length > 200) { %>...<% } %>
+  </div>
+
+  <!-- SCROLLBOX: ẩn ban đầu, hiện khi click Xem thêm -->
+  <div id="descScrollBox" style="display:none; margin-top:10px;">
+    <div style="
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      padding: 14px 16px;
+      background: #fafafa;
+      font-size: 0.88rem;
+      color: #444;
+      line-height: 1.9;
+      white-space: pre-line;
+      scroll-behavior: smooth;
+    "
+    id="descScrollContent">
       <%= product.description %>
     </div>
-    <div class="desc-fade" id="descFade"></div>
   </div>
-  <button type="button" class="desc-toggle-btn" id="descToggleBtn" onclick="toggleDesc()">
+
+  <!-- NÚT XEM THÊM / THU GỌN — NGOÀI FORM, type=button bắt buộc -->
+  <% if(product.description && product.description.length > 200) { %>
+  <button type="button" id="descToggleBtn" onclick="toggleDescBox()"
+    style="
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      width:100%; margin-top:10px; padding:7px;
+      background:none; border:1px solid #e0e0e0; border-radius:2px;
+      color:#ee4d2d; font-size:0.87rem; font-weight:500;
+      cursor:pointer; transition:background 0.15s;
+    "
+    onmouseover="this.style.background='#fff2ee'"
+    onmouseout="this.style.background='none'">
     <span id="descBtnLabel">Xem thêm</span>
-    <i class="bi bi-chevron-down" id="descBtnIcon"></i>
+    <i class="bi bi-chevron-down" id="descBtnIcon"
+       style="font-size:0.8rem; transition:transform 0.3s;"></i>
   </button>
+  <% } %>
 </div>
 
-<style>
-.desc-collapse-wrap {
-  position: relative;
-  max-height: 120px;
-  overflow: hidden;
-  transition: max-height 0.4s ease;
-}
-.desc-collapse-wrap.expanded { max-height: 2000px; }
-.desc-fade {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 60px;
-  background: linear-gradient(transparent, #fff);
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.desc-collapse-wrap.expanded .desc-fade { opacity: 0; }
-.desc-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  margin-top: 10px;
-  padding: 8px;
-  background: none;
-  border: 1px solid #e0e0e0;
-  border-radius: 2px;
-  color: #ee4d2d;
-  font-size: 0.88rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.desc-toggle-btn:hover { background: #fff2ee; }
-#descBtnIcon { transition: transform 0.3s; font-size: 0.8rem; }
-.expanded-btn #descBtnIcon { transform: rotate(180deg); }
-</style>
-
 <script>
-function toggleDesc() {
-  const wrap  = document.getElementById('descWrap');
-  const btn   = document.getElementById('descToggleBtn');
-  const label = document.getElementById('descBtnLabel');
-  const isExpanded = wrap.classList.toggle('expanded');
-  btn.classList.toggle('expanded-btn', isExpanded);
-  label.textContent = isExpanded ? 'Thu gọn' : 'Xem thêm';
+function toggleDescBox() {
+  var preview  = document.getElementById('descPreview');
+  var scrollBox = document.getElementById('descScrollBox');
+  var label    = document.getElementById('descBtnLabel');
+  var icon     = document.getElementById('descBtnIcon');
+
+  var isOpen = scrollBox.style.display === 'block';
+
+  if (isOpen) {
+    // Thu gọn
+    scrollBox.style.display = 'none';
+    preview.style.display   = 'block';
+    label.textContent       = 'Xem thêm';
+    icon.style.transform    = 'rotate(0deg)';
+  } else {
+    // Mở scrollbox, ẩn preview
+    scrollBox.style.display = 'block';
+    preview.style.display   = 'none';
+    label.textContent       = 'Thu gọn';
+    icon.style.transform    = 'rotate(180deg)';
+    // Scroll về đầu scrollbox
+    document.getElementById('descScrollContent').scrollTop = 0;
+  }
 }
+
+ const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('error') === 'ordered_only') {
+    alert('Bạn chỉ có thể gửi bình luận/đánh giá sản phẩm này sau khi đơn hàng chứa sản phẩm đã được giao thành công!');
+  }
 </script>
 
   <!-- THANH CUỐN NGANG SẢN PHẨM LIÊN QUAN (Chuẩn Grid/Flex bo mờ Shopee) -->

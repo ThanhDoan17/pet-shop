@@ -25,11 +25,31 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-app.use((req, res, next) => {
+// ==========================================
+// ĐOẠN ĐƯỢC NÂNG CẤP (Bảo toàn biến cũ và thêm bộ đếm thông báo)
+// ==========================================
+app.use(async (req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.cartCount = req.session.cart ? req.session.cart.length : 0;
+  
+  // Khởi tạo biến lưu số thông báo chưa đọc toàn cục cho EJS sử dụng
+  res.locals.unreadNotificationsCount = 0; 
+
+  // Nếu người dùng (Khách/Staff/Admin) đã đăng nhập, tiến hành đếm số thông báo chưa đọc thực tế
+  if (req.session.user) {
+    try {
+      const Notification = require('./models/Notification');
+      res.locals.unreadNotificationsCount = await Notification.countDocuments({
+        userId: req.session.user.id,
+        isRead: false
+      });
+    } catch (err) {
+      console.error("Lỗi đếm số lượng thông báo tại app.js middleware:", err);
+    }
+  }
   next();
 });
+// ==========================================
 
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
@@ -48,6 +68,12 @@ app.use('/admin', adminRoutes);
 
 const staffRoutes = require('./routes/staff');
 app.use('/staff', staffRoutes);
+
+const notificationRoutes = require('./routes/notifications');
+app.use('/notifications', notificationRoutes);
+
+const messageRoutes = require('./routes/messages');
+app.use('/messages', messageRoutes);
 
 app.get('/api/featured-products', async (req, res) => {
   try {

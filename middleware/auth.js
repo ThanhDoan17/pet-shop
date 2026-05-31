@@ -19,4 +19,14 @@ const isCustomer = (req, res, next) => {
   next();
 };
 
+const isStaffAPI = (req, res, next) => {
+  if (req.session.user && ['admin', 'staff'].includes(req.session.user.role)) {
+    return next();
+  }
+  return res.status(403).json({ 
+    success: false, 
+    message: "Quyền hạn không hợp lệ. Bạn phải là nhân viên hoặc quản trị viên!" 
+  });
+};
+
 module.exports = { isLoggedIn, isAdmin, isStaff, isCustomer };

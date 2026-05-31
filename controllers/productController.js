@@ -62,7 +62,7 @@ exports.getProductDetail = async (req, res) => {
   }
 };
 
-// 3. Xử lý lưu tin nhắn chat & Điểm đánh giá sao từ giao diện vào Database
+// 3. Xử lý lưu tin nhắn chat & Điểm đánh giá sao từ giao diện vào Database (ĐÃ TÍCH HỢP BỘ LỌC CHẶN)
 exports.createProductReview = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -71,13 +71,41 @@ exports.createProductReview = async (req, res) => {
     // Lấy thông tin tài khoản đang đăng nhập từ Session hệ thống (Khớp với app.js)
     const currentUser = req.session.user;
 
+    // ==========================================================
+    // KHỐI LỆNH MỚI: KIỂM TRA ĐIỀU KIỆN ĐƠN HÀNG "DELIVERED"
+    // ==========================================================
+    if (currentUser) {
+      const Order = require('../models/Order');
+      
+      // Thực hiện câu lệnh truy vấn tìm kiếm đơn hàng thỏa mãn 3 điều kiện đồng thời
+      const targetOrder = await Order.findOne({
+        user: currentUser.id, // Phù hợp với thuộc tính id định danh trong session
+        status: 'delivered',   // Đơn hàng bắt buộc phải giao thành công
+        'items.product': productId // Trong đơn hàng bắt buộc phải có sản phẩm này
+      });
+
+      // Nếu khách hàng chưa mua hoặc đơn hàng chưa hoàn tất giao, tiến hành chặn
+      if (!targetOrder) {
+        // Render lại trang hoặc truyền thông điệp thông báo. Ở đây ta chuyển hướng kèm log lỗi
+        console.log("=== HỆ THỐNG: CHẶN ĐÁNH GIÁ DO ĐƠN HÀNG CHƯA ĐƯỢC DELIVERED ===");
+        
+        // Bạn có thể tùy biến dùng thư viện flash message hoặc truyền biến thông báo lỗi ra view EJS tại đây nếu cần
+        return res.redirect(`/products/${productId}?error=ordered_only`);
+      }
+    } else {
+      // Nếu là tài khoản vãng lai chưa đăng nhập (Test User), tùy theo thiết kế nghiệp vụ của bạn:
+      // Ở đây hệ thống giữ nguyên luồng cũ của bạn, cho phép chạy tiếp xuống phần sinh ID ngẫu nhiên.
+    }
+    // ==========================================================
+
     // SỬA TẠI ĐÂY: Khởi tạo dữ liệu ID an toàn, không bị undefined nếu chưa đăng nhập
     let userId;
     let userName = 'Test User';
     let userRole = 'user';
 
-    if (currentUser && currentUser._id) {
-      userId = currentUser._id;
+    // Đồng bộ lại logic trích xuất id từ session (.id thay vì ._id để khớp với authController)
+    if (currentUser && currentUser.id) {
+      userId = currentUser.id;
       userName = currentUser.name;
       userRole = currentUser.role || 'user';
     } else {
@@ -153,4 +181,3 @@ exports.deleteReply = async (req, res) => {
     res.redirect(`/products/${productId}`);
   }
 };
-

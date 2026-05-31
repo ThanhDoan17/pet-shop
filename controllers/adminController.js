@@ -117,12 +117,24 @@ exports.getOrders = async (req, res) => {
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    await Order.findByIdAndUpdate(req.params.id, { status: req.body.status });
+    const { status } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.redirect(req.get('Referer') || '/admin/orders');
+
+    await Order.findByIdAndUpdate(req.params.id, { status });
+
+    // Tạo thông báo khi đơn hàng được giao thành công
+    if (status === 'delivered' && order.status !== 'delivered') {
+      const { createDeliveredNotification } = require('./notificationController');
+      const orderCode = order._id.toString().slice(-6).toUpperCase();
+      await createDeliveredNotification(order.user, order._id, orderCode);
+    }
+
     const referer = req.get('Referer') || '/admin/orders';
     res.redirect(referer);
   } catch (err) {
-    const referer = req.get('Referer') || '/admin/orders';
-    res.redirect(referer);
+    console.error(err);
+    res.redirect(req.get('Referer') || '/admin/orders');
   }
 };
 

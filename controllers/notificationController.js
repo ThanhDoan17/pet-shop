@@ -2,7 +2,63 @@ const Notification = require('../models/Notification');
 const Order = require('../models/Order');
 const Review = require('../models/Review');
 
-// Lấy danh sách thông báo
+// ==========================================
+// CHỨC NĂNG MỚI: NHÂN VIÊN/ADMIN CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG KÈM GHI VẾT
+// ==========================================
+exports.updateOrderStatusByStaff = async (req, res) => {
+  try {
+    // Kiểm tra quyền an toàn bảo mật tuyến luồng
+    if (!req.session.user || !['admin', 'staff'].includes(req.session.user.role)) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền thực hiện hành động này.' });
+    }
+
+    const { orderId } = req.params;
+    const { status } = req.body; // Giá trị mong đợi: 'confirmed', 'shipping', 'delivered', 'cancelled'
+    
+    // Trích xuất thông tin định danh từ Session quản lý phiên
+    const staffId = req.session.user.id;
+    const staffRole = req.session.user.role; // 'staff' hoặc 'admin'
+
+    // 1. Truy vấn tài liệu Đơn hàng từ Database
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng.' });
+    }
+
+    // 2. Chuyển đổi trạng thái hiện tại
+    order.status = status;
+
+    // 3. Đẩy thông tin Log vào mảng Lịch sử vết (Audit Trail)
+    order.statusHistory.push({
+      status: status,
+      updatedBy: staffId,
+      roleAtTime: staffRole,
+      updatedAt: new Date()
+    });
+
+    // 4. Lưu trạng thái xuống cơ sở dữ liệu MongoDB
+    await order.save();
+
+    // 5. Nếu trạng thái chuyển sang "delivered", kích hoạt hàm sinh thông báo tự động của bạn
+    if (status === 'delivered') {
+      // Hàm tạo thông báo cũ của bạn yêu cầu: userId, orderId, orderCode (sử dụng tạm _id làm mã đơn nếu không có trường mã riêng)
+      const orderCode = order.orderCode || order._id.toString().slice(-6).toUpperCase(); 
+      await exports.createDeliveredNotification(order.user, order._id, orderCode);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Đã cập nhật trạng thái đơn hàng sang: ${status} thành công.`,
+      data: order
+    });
+
+  } catch (err) {
+    console.error('Lỗi cập nhật trạng thái hệ thống:', err);
+    return res.status(500).json({ success: false, message: 'Có lỗi xảy ra trong quá trình cập nhật đơn hàng.' });
+  }
+};
+
+// Lấy danh sách thông báo và Render giao diện EJS
 exports.getNotifications = async (req, res) => {
   try {
     if (!req.session.user) return res.redirect('/auth/login');
@@ -20,7 +76,7 @@ exports.getNotifications = async (req, res) => {
   }
 };
 
-// Đếm thông báo chưa đọc (API)
+// Đếm thông báo chưa đọc (API phục vụ Badge trên Navbar)
 exports.getUnreadCount = async (req, res) => {
   try {
     if (!req.session.user) return res.json({ count: 0 });
@@ -34,14 +90,12 @@ exports.getUnreadCount = async (req, res) => {
   }
 };
 
-// Tạo thông báo khi đơn hàng delivered
+// Tạo thông báo khi đơn hàng delivered cho từng sản phẩm
 exports.createDeliveredNotification = async (userId, orderId, orderCode) => {
   try {
-    // Lấy các sản phẩm trong đơn hàng
     const order = await Order.findById(orderId).populate('items.product');
     if (!order) return;
 
-    // Tạo thông báo cho từng sản phẩm trong đơn
     for (const item of order.items) {
       await Notification.create({
         userId,
