@@ -1,31 +1,127 @@
 <%- include('partials/header') %>
+
 <div class="container py-4">
-  <h2 class="section-title"><i class="bi bi-bag"></i> Đơn hàng của tôi</h2>
-  <% if (orders.length === 0) { %>
-    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
-      <div class="fs-1">📦</div>
-      <h4 class="text-muted mt-3">Chưa có đơn hàng nào</h4>
-      <a href="/products" class="btn btn-primary mt-3">Mua sắm ngay</a>
-    </div>
-  <% } else { %>
-    <div class="bg-white rounded-3 shadow-sm">
-      <% orders.forEach(o => { %>
-      <div class="p-4 border-bottom">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <span class="fw-bold">#<%= o._id.toString().slice(-6).toUpperCase() %></span>
-            <span class="text-muted ms-3 small"><%= o.createdAt.toLocaleDateString('vi-VN') %></span>
-          </div>
-          <div>
-            <span class="badge bg-<%= o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'warning text-dark' %>">
-              <%= o.status === 'pending' ? 'Chờ xử lý' : o.status === 'confirmed' ? 'Đã xác nhận' : o.status === 'shipping' ? 'Đang giao' : o.status === 'delivered' ? 'Đã giao' : 'Đã hủy' %>
-            </span>
-          </div>
+    <h2 class="section-title mb-4"><i class="bi bi-bag-check me-2"></i> Đơn hàng của tôi</h2>
+
+    <% if (orders.length === 0) { %>
+        <div class="text-center py-5 bg-white rounded-3 shadow-sm">
+            <div class="fs-1 mb-3">📦</div>
+            <h4 class="text-muted">Chưa có đơn hàng nào</h4>
+            <a href="/products" class="btn btn-primary mt-3">Mua sắm ngay</a>
         </div>
-        <div class="mt-2 text-warning fw-bold"><%= o.totalPrice.toLocaleString('vi-VN') %> đ</div>
-      </div>
-      <% }) %>
-    </div>
-  <% } %>
+    <% } else { %>
+        <% orders.forEach(order => { %>
+        <div class="card mb-4 shadow-sm border-0 overflow-hidden">
+            
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>#<%= order._id.toString().slice(-6).toUpperCase() %></strong>
+                    <span class="text-muted ms-3"><%= order.createdAt.toLocaleDateString('vi-VN') %> • <%= order.createdAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) %></span>
+                </div>
+                <span class="badge <%= 
+                    order.status === 'delivered' ? 'bg-success' : 
+                    order.status === 'cancelled' ? 'bg-danger' : 
+                    order.status === 'shipping' ? 'bg-info' : 
+                    order.status === 'confirmed' ? 'bg-primary' : 'bg-warning text-dark' %>">
+                    <%= order.status === 'pending' ? 'Chờ xử lý' : 
+                        order.status === 'confirmed' ? 'Đã xác nhận' : 
+                        order.status === 'shipping' ? 'Đang giao' : 
+                        order.status === 'delivered' ? 'Đã giao' : 'Đã hủy' %>
+                </span>
+            </div>
+
+            <div class="card-body p-0">
+                <% order.items.forEach(item => { %>
+                <div class="d-flex p-3 border-bottom">
+                    <img src="<%= item.product?.image || item.image || '/images/default.jpg' %>" 
+                         width="85" height="85" class="rounded border me-3" style="object-fit: cover;">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fw-bold"><%= item.product?.name || item.name %></h6>
+                        <small class="text-muted"><%= item.price.toLocaleString('vi-VN') %> đ × <%= item.quantity %></small>
+                    </div>
+                    <div class="text-end fw-bold text-danger">
+                        <%= (item.price * item.quantity).toLocaleString('vi-VN') %> đ
+                    </div>
+                </div>
+                <% }) %>
+            </div>
+
+            <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Tổng tiền:</strong> 
+                    <span class="text-danger fw-bold fs-5"><%= order.totalPrice.toLocaleString('vi-VN') %> đ</span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <% if (order.status === 'delivered') { %>
+                        <a href="/products/<%= order.items[0]?.product?._id || '#' %>?review=true&orderId=<%= order._id %>"
+                           class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-star-fill"></i> Đánh giá
+                        </a>
+                        <button onclick="muaLaiDonHang('<%= order._id %>')" class="btn btn-danger btn-sm">
+                            <i class="bi bi-cart-plus"></i> Mua lại
+                        </button>
+                    <% } else if (order.status === 'cancelled') { %>
+                        <button onclick="muaLaiDonHang('<%= order._id %>')" class="btn btn-danger btn-sm">
+                            <i class="bi bi-cart-plus"></i> Mua lại
+                        </button>
+                    <% } else if (order.status === 'pending') { %>
+                        <button onclick="xuLyHuyDonHang('<%= order._id %>')" class="btn btn-outline-danger btn-sm">
+                            Hủy đơn
+                        </button>
+                    <% } else { %>
+                        <!-- Các trạng thái khác (confirmed, shipping) chỉ cho Mua lại -->
+                        <button onclick="muaLaiDonHang('<%= order._id %>')" class="btn btn-danger btn-sm">
+                            <i class="bi bi-cart-plus"></i> Mua lại
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    <% } %>
 </div>
+
+<script>
+async function muaLaiDonHang(orderId) {
+    if (!confirm("Thêm tất cả sản phẩm trong đơn hàng này vào giỏ?")) return;
+
+    try {
+        const res = await fetch(`/orders/${orderId}/repurchase`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            alert("Đã thêm vào giỏ hàng thành công!");
+            window.location.href = '/cart';
+        } else {
+            alert(data.message || "Có lỗi xảy ra");
+        }
+    } catch (err) {
+        alert("Lỗi kết nối. Vui lòng thử lại sau!");
+    }
+}
+
+async function xuLyHuyDonHang(orderId) {
+    if (!confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) return;
+    try {
+        const response = await fetch(`/orders/${orderId}/cancel`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message || "Đơn hàng đã được hủy!");
+            window.location.reload();
+        } else {
+            alert(result.message || "Không thể hủy đơn hàng.");
+        }
+    } catch (err) {
+        alert("Lỗi kết nối!");
+    }
+}
+</script>
+
 <%- include('partials/footer') %>

@@ -281,15 +281,7 @@ function toggleDescBox() {
     body {
   overflow-x: hidden !important;
 }
-/* Đảm bảo footer luôn full width */
-footer, .footer, [class*="footer"] {
-  width: 100vw !important;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw !important;
-  margin-right: -50vw !important;
-}
+
   </style>
 
 
@@ -334,14 +326,13 @@ footer, .footer, [class*="footer"] {
       <div class="bg-white p-4 rounded-4 shadow-sm border border-light d-flex flex-column" style="height: 400px;">
         <h4 class="fw-bold text-dark mb-3" style="font-size: 1.2rem;"><i class="bi bi-chat-dots text-info me-2"></i>Phòng trao đổi trực tuyến</h4>
         
-        <!-- Khung danh sách tin nhắn cuộn nội bộ giống Messenger -->
         <div class="flex-grow-1 overflow-y-auto pe-1 d-flex flex-column gap-3" style="scroll-behavior: smooth;">
           <% if (typeof reviews !== 'undefined' && reviews.length > 0) { %>
             <% reviews.forEach(rev => { %>
               <div class="d-flex gap-2 align-items-start">
                 <!-- Avatar giả lập dựa trên vai trò -->
-                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm flex-shrink-0" 
-class="align-items-center justify-content-center text-white fw-bold shadow-sm flex-shrink-0 role-avatar-<%= rev.userRole %>"
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm flex-shrink-0 role-avatar-<%= rev.userRole %>"
+                  style="width:36px;height:36px;font-size:.85rem;background-color:#077416;">
                   <%= rev.userName ? rev.userName.charAt(0).toUpperCase() : 'U' %>
                 </div>
                 <!-- Khối nội dung tin nhắn chat -->
@@ -393,7 +384,6 @@ class="align-items-center justify-content-center text-white fw-bold shadow-sm fl
                     </div>
                   <% } %>
 
-                  <!-- FORM REPLY CHO ADMIN/STAFF -->
                   <% if (typeof user !== 'undefined' && user && (user.role === 'admin' || user.role === 'staff') && !rev.reply) { %>
                     <div class="mt-2 pt-2 border-top">
                       <form method="POST" action="/products/<%= product._id %>/review/<%= rev._id %>/reply" class="d-flex gap-2">
@@ -420,7 +410,6 @@ class="align-items-center justify-content-center text-white fw-bold shadow-sm fl
 
 </div>
 
-<!-- CSS BỔ SUNG CHO HIỆU ỨNG TRANG CHI TIẾT SẢN PHẨM -->
 <style>
   .scrollbar-hidden::-webkit-scrollbar { display: none; }
   .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
@@ -428,7 +417,6 @@ class="align-items-center justify-content-center text-white fw-bold shadow-sm fl
   .transform-hover:hover { transform: scale(1.04); }
   .fw-extrabold { font-weight: 800; }
   
-  /* Tạo hiệu ứng hover chọn sao ngược từ phải qua trái chuyên nghiệp */
   .rating-input { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
   .rating-input input:checked ~ label,
   .rating-input label:hover,

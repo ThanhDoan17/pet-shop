@@ -760,3 +760,19 @@ footer { margin-top: auto; }
   font-size: 0.88rem !important;
   font-weight: 600 !important;
 }
+
+.order-products img{
+    border:1px solid #eee;
+}
+
+.order-products .d-flex{
+    transition:0.2s;
+}
+
+.order-products .d-flex:hover{
+    background:#fafafa;
+}
+
+.order-card{
+    border-radius:12px;
+}

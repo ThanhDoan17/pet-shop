@@ -1,62 +1,51 @@
-<%- include('../partials/header') %>
-<div class="container py-4">
-  <h2 class="section-title"><i class="bi bi-bag"></i> Quản lý đơn hàng</h2>
+<%- include('../layouts/dashboard', { 
+    title: 'Quản lý Đơn hàng',
+    pageTitle: 'Quản lý Đơn hàng',
+    currentPage: 'orders',
+    user: user,
+    body: `
+    
 
-  <div class="mb-4">
-    <a href="/admin" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a href="/admin/products" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-box"></i> Sản phẩm</a>
-    <a href="/admin/statistics" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart"></i> Thống kê</a>
-  </div>
-
-  <% if (orders.length === 0) { %>
-    <div class="text-center py-5 bg-white rounded-3 shadow-sm">
-      <div class="fs-1">📦</div>
-      <h4 class="text-muted mt-3">Chưa có đơn hàng nào</h4>
-    </div>
-  <% } else { %>
-    <div class="bg-white rounded-3 shadow-sm">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <th>Mã đơn</th>
-              <th>Khách hàng</th>
-              <th>Tổng tiền</th>
-              <th>Trạng thái</th>
-              <th>Ngày đặt</th>
-              <th>Cập nhật</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% orders.forEach(o => { %>
-            <tr>
-              <td><span class="badge bg-secondary">#<%= o._id.toString().slice(-6).toUpperCase() %></span></td>
-              <td><i class="bi bi-person"></i> <%= o.user ? o.user.name : 'N/A' %></td>
-              <td class="fw-bold text-success"><%= o.totalPrice.toLocaleString('vi-VN') %> đ</td>
-              <td>
-                <span class="badge bg-<%= o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : o.status === 'shipping' ? 'info' : o.status === 'confirmed' ? 'primary' : 'warning text-dark' %>">
-                  <%= o.status === 'pending' ? 'Chờ xử lý' : o.status === 'confirmed' ? 'Đã xác nhận' : o.status === 'shipping' ? 'Đang giao' : o.status === 'delivered' ? 'Đã giao' : 'Đã hủy' %>
-                </span>
-              </td>
-              <td><%= o.createdAt.toLocaleDateString('vi-VN') %></td>
-              <td>
-                <form method="POST" action="/admin/orders/<%= o._id %>/status" class="d-flex gap-2">
-                  <select name="status" class="form-select form-select-sm" style="width:140px">
-                    <option value="pending" <%= o.status === 'pending' ? 'selected' : '' %>>Chờ xử lý</option>
-                    <option value="confirmed" <%= o.status === 'confirmed' ? 'selected' : '' %>>Đã xác nhận</option>
-                    <option value="shipping" <%= o.status === 'shipping' ? 'selected' : '' %>>Đang giao</option>
-                    <option value="delivered" <%= o.status === 'delivered' ? 'selected' : '' %>>Đã giao</option>
-                    <option value="cancelled" <%= o.status === 'cancelled' ? 'selected' : '' %>>Đã hủy</option>
-                  </select>
-                  <button class="btn btn-sm btn-primary">Lưu</button>
-                </form>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  <% } %>
-</div>
-<%- include('../partials/footer') %>
+        <div class="dash-card" style="padding:0;overflow:hidden">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày đặt</th>
+                        <th>Cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${orders.map(o => `
+                        <tr>
+                            <td><span class="dash-badge dash-badge--gray">#${o._id.toString().slice(-6).toUpperCase()}</span></td>
+                            <td><i class="bi bi-person me-1"></i>${o.user ? o.user.name : 'N/A'}</td>
+                            <td class="fw-bold" style="color:var(--accent)">${o.totalPrice ? o.totalPrice.toLocaleString('vi-VN') : '0'} đ</td>
+                            <td>
+                                <span class="dash-badge ${o.status==='delivered' ? 'dash-badge--green' : o.status==='cancelled' ? 'dash-badge--red' : o.status==='shipping' ? 'dash-badge--blue' : 'dash-badge--orange'}">
+                                    ${o.status==='pending' ? 'Chờ xử lý' : o.status==='confirmed' ? 'Đã xác nhận' : o.status==='shipping' ? 'Đang giao' : o.status==='delivered' ? 'Đã giao' : 'Đã hủy'}
+                                </span>
+                            </td>
+                            <td style="font-size:.82rem;color:var(--gray-4)">${o.createdAt.toLocaleDateString('vi-VN')}</td>
+                            <td>
+                                <form method="POST" action="/admin/orders/${o._id}/status" class="d-flex gap-2">
+                                    <select name="status" class="form-select form-select-sm" style="width:140px">
+                                        <option value="pending" ${o.status==='pending' ? 'selected' : ''}>Chờ xử lý</option>
+                                        <option value="confirmed" ${o.status==='confirmed' ? 'selected' : ''}>Đã xác nhận</option>
+                                        <option value="shipping" ${o.status==='shipping' ? 'selected' : ''}>Đang giao</option>
+                                        <option value="delivered" ${o.status==='delivered' ? 'selected' : ''}>Đã giao</option>
+                                        <option value="cancelled" ${o.status==='cancelled' ? 'selected' : ''}>Đã hủy</option>
+                                    </select>
+                                    <button class="dash-btn dash-btn--primary dash-btn--sm">Lưu</button>
+                                </form>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `
+}) %>

@@ -387,6 +387,23 @@
   box-shadow: 0 6px 20px rgba(13,110,253,0.3);
 }
 
+.pcard-badge--discount {
+  top: auto; bottom: 8px; left: 8px;
+  background: #e53935;
+  font-size: 0.65rem; font-weight: 700;
+  padding: 3px 7px; border-radius: 2px;
+  color: #fff; position: absolute;
+}
+.pcard-badge--register {
+  top: auto; bottom: 8px; left: 8px;
+  background: #1565c0;
+  font-size: 0.62rem; font-weight: 700;
+  padding: 3px 7px; border-radius: 2px;
+  color: #fff; position: absolute;
+  max-width: 120px; line-height: 1.3;
+  text-align: center;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 991px) {
   .popcat-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; }
@@ -497,8 +514,6 @@
   </div>
 </section>
 
-
-
 <!-- CHATBOT -->
 <button class="chatbot-btn" onclick="toggleChat()" title="Hỗ trợ">
   <i class="bi bi-chat-dots-fill"></i>
@@ -577,11 +592,16 @@ document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
 /* PRODUCT CARD */
 function productCard(p) {
+  const isLoggedIn = document.body.dataset.loggedIn === 'true';
+  const badge = isLoggedIn
+    ? `<span class="pcard-badge pcard-badge--discount">GIẢM 10%</span>`
+    : `<span class="pcard-badge pcard-badge--register">ĐĂNG KÝ TÀI KHOẢN -10%</span>`;
   return `
   <div class="pcard">
     <a href="/products/${p._id}" class="pcard-img-wrap">
       <img src="${p.image}" alt="${p.name}" loading="lazy">
       <span class="pcard-badge">Mới</span>
+      ${badge}
     </a>
     <div class="pcard-body">
       <p class="pcard-name">${p.name}</p>

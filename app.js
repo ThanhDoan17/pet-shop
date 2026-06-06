@@ -89,6 +89,10 @@ app.get('/about', (req, res) => {
   res.render('about', { title: 'Gioi thieu' });
 });
 
+app.get('/warranty', (req, res) => {
+  res.render('warranty', { title: 'Chính sách Bảo hành' });
+});
+
 app.get('/revenue', async (req, res) => {
   try {
     const Order = require('./models/Order');
@@ -140,6 +144,7 @@ app.get('/', (req, res) => {
   if (req.session.user && req.session.user.role === 'staff') return res.redirect('/staff/inventory');
   res.render('index', { title: 'Pet Shop' });
 });
+
 const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV === 'production') {

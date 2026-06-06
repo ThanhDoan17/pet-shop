@@ -2,12 +2,23 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const User = require('../models/User');
 
-exports.getDashboard = async (req, res) => {
+const upload = require('../config/multer');
+
+exports.dashboard = async (req, res) => {   
   try {
     const totalProducts = await Product.countDocuments();
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ status: 'pending' });
-    res.render('admin/dashboard', { title: 'Admin Dashboard', totalProducts, totalOrders, pendingOrders });
+
+    res.render('admin/dashboard', {
+      title: 'Admin Dashboard',
+      pageTitle: 'Trang tổng quan',
+      currentPage: 'dashboard',
+      user: req.session.user,
+      totalProducts, 
+      totalOrders, 
+      pendingOrders
+    });
   } catch (err) {
     console.error(err);
     res.redirect('/');
@@ -29,9 +40,12 @@ exports.getProducts = async (req, res) => {
     const isStaffUser = req.session.user && req.session.user.role === 'staff';
     const view = isStaffUser ? 'staff/inventory' : 'admin/products';
     res.render(view, {
-      title: isStaffUser ? 'Quan ly ton kho' : 'Quan ly san pham',
-      products, search: search || '', sort: sort || ''
-    });
+  title: isStaffUser ? 'Quản lý tồn kho' : 'Quản lý sản phẩm',
+  pageTitle: isStaffUser ? 'Quản lý tồn kho' : 'Quản lý sản phẩm',
+  currentPage: isStaffUser ? 'inventory' : 'products',
+  user: req.session.user,
+  products, search: search || '', sort: sort || ''
+});
   } catch (err) {
     console.error(err);
     res.redirect('/admin');
@@ -41,24 +55,46 @@ exports.getProducts = async (req, res) => {
 exports.getAddProduct = (req, res) => {
   const isStaffUser = req.session.user && req.session.user.role === 'staff';
   const formAction = isStaffUser ? '/staff/products/add' : '/admin/products/add';
-  res.render('admin/product-form', { title: 'Them san pham', product: null, error: null, formAction });
+res.render('admin/product-form', {
+  title: 'Thêm sản phẩm',
+  pageTitle: 'Thêm sản phẩm mới',
+  currentPage: 'add-product',
+  user: req.session.user,
+  product: null, error: null, formAction});
 };
 
-exports.postAddProduct = async (req, res) => {
-  try {
-    const { name, description, price, category, stock } = req.body;
-    let image = '/images/default.jpg';
-    if (req.file) image = '/images/' + req.file.filename;
-    const product = new Product({ name, description, price, category, stock, image });
-    await product.save();
-    const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-    res.redirect(redirectTo);
-  } catch (err) {
-    console.error(err);
-    const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-    res.redirect(redirectTo);
+exports.postAddProduct = [
+  upload.single('image'),   // Middleware upload
+  async (req, res) => {
+    try {
+      const { name, description, price, category, stock } = req.body;
+
+      let image = '/images/default.jpg';
+      if (req.file) {
+        image = req.file.path;           // <-- Đây là URL từ Cloudinary
+      }
+
+      const product = new Product({
+        name,
+        description,
+        price: Number(price),
+        category,
+        stock: Number(stock),
+        image,
+        isActive: true
+      });
+
+      await product.save();
+
+      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
+      res.redirect(redirectTo);
+    } catch (err) {
+      console.error(err);
+      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
+      res.redirect(redirectTo);
+    }
   }
-};
+];
 
 exports.getEditProduct = async (req, res) => {
   try {
@@ -66,25 +102,46 @@ exports.getEditProduct = async (req, res) => {
     if (!product) return res.redirect('/admin/products');
     const isStaffUser = req.session.user && req.session.user.role === 'staff';
     const formAction = isStaffUser ? `/staff/products/edit/${product._id}` : `/admin/products/edit/${product._id}`;
-    res.render('admin/product-form', { title: 'Sua san pham', product, error: null, formAction });
-  } catch (err) {
+res.render('admin/product-form', {
+  title: 'Sửa sản phẩm',
+  pageTitle: 'Chỉnh sửa sản phẩm',
+  currentPage: 'products',
+  user: req.session.user,
+  product, error: null, formAction
+});  } catch (err) {
     res.redirect('/admin/products');
   }
 };
 
-exports.postEditProduct = async (req, res) => {
-  try {
-    const { name, description, price, category, stock } = req.body;
-    const update = { name, description, price, category, stock };
-    if (req.file) update.image = '/images/' + req.file.filename;
-    await Product.findByIdAndUpdate(req.params.id, update);
-    const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-    res.redirect(redirectTo);
-  } catch (err) {
-    const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-    res.redirect(redirectTo);
+exports.postEditProduct = [
+  upload.single('image'),
+  async (req, res) => {
+    try {
+      const { name, description, price, category, stock } = req.body;
+      
+      const update = { 
+        name, 
+        description, 
+        price: Number(price), 
+        category, 
+        stock: Number(stock) 
+      };
+
+      if (req.file) {
+        update.image = req.file.path;     // <-- URL Cloudinary
+      }
+
+      await Product.findByIdAndUpdate(req.params.id, update);
+
+      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
+      res.redirect(redirectTo);
+    } catch (err) {
+      console.error(err);
+      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
+      res.redirect(redirectTo);
+    }
   }
-};
+];
 
 exports.deleteProduct = async (req, res) => {
   try {
@@ -103,13 +160,19 @@ exports.getOrders = async (req, res) => {
     orders.sort((a, b) => {
       if (statusOrder[a.status] !== statusOrder[b.status]) {
         return statusOrder[a.status] - statusOrder[b.status];
-      }
+      }s
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
     const isStaffUser = req.session.user && req.session.user.role === 'staff';
     const view = isStaffUser ? 'staff/orders' : 'admin/orders';
-    res.render(view, { title: 'Quan ly don hang', orders });
+    res.render(view, {
+  title: 'Quản lý đơn hàng',
+  pageTitle: 'Quản lý đơn hàng',
+  currentPage: 'orders',
+  user: req.session.user,
+  orders
+});
   } catch (err) {
     res.redirect('/');
   }
@@ -192,13 +255,16 @@ exports.getStatistics = async (req, res) => {
     ]);
 
     res.render('admin/statistics', {
-      title: 'Thong ke & Bao cao',
-      totalProducts, maxPrice, minPrice,
-      avgPrice: Math.round(avgPrice),
-      totalValue, totalOrders, revenue,
-      orderStats, topProducts,
-      type, year: parseInt(year), month: parseInt(month), labelFormat
-    });
+  title: 'Thống kê & Báo cáo',
+  pageTitle: 'Thống kê & Báo cáo',
+  currentPage: 'statistics',
+  user: req.session.user,
+  totalProducts, maxPrice, minPrice,
+  avgPrice: Math.round(avgPrice),
+  totalValue, totalOrders, revenue,
+  orderStats, topProducts,
+  type, year: parseInt(year), month: parseInt(month), labelFormat
+});
   } catch (err) {
     console.error(err);
     res.redirect('/admin');
@@ -233,7 +299,13 @@ exports.getUsers = async (req, res) => {
       { email: { $regex: search, $options: 'i' } }
     ];
     const users = await User.find(filter).sort({ createdAt: -1 });
-    res.render('admin/users', { title: 'Quan ly nguoi dung', users, search: search || '' });
+    res.render('admin/users', {
+  title: 'Quản lý người dùng',
+  pageTitle: 'Quản lý người dùng',
+  currentPage: 'users',
+  user: req.session.user,
+  users, search: search || ''
+});
   } catch (err) {
     res.redirect('/admin');
   }
@@ -269,7 +341,14 @@ exports.getReviews = async (req, res) => {
       .populate('productId', 'name image')
       .sort({ createdAt: -1 });
 
-    res.render('admin/reviews', { title: 'Quan ly phan hoi', reviews, search: search || '' });
+    res.render('admin/reviews', {
+      title: 'Quản lý phản hồi',
+      pageTitle: 'Quản lý phản hồi',
+      currentPage: 'reviews',
+      user: req.session.user,
+      reviews,
+      search: search || ''
+    });
   } catch (err) {
     console.error(err);
     res.redirect('/admin');

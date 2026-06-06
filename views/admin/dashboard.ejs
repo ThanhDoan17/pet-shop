@@ -1,65 +1,35 @@
-<%- include('../partials/header') %>
-<div class="container py-4">
-  <h2 class="section-title"><i class="bi bi-speedometer2"></i> Admin Dashboard</h2>
+<%- include('../layouts/dashboard', { 
+    title: 'Trang Tổng Quan',
+    pageTitle: 'Trang tổng quan',
+    currentPage: 'dashboard',
+    user: user,
+    body: `
+        <div class="dashboard-content-inner p-4">
+            <h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i> Trang tổng quan</h2>
 
-  <!-- Nav -->
-  <div class="mb-4">
-    <a href="/admin/products" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-box"></i> Sản phẩm</a>
-    <a href="/admin/orders" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bag"></i> Đơn hàng</a>
-    <a href="/admin/statistics" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bar-chart"></i> Thống kê</a>
-    <a href="/admin/users" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-people"></i> Người dùng</a>
-    <a href="/admin/reviews" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-chat-square-text"></i> Phản hồi</a>
-    <a href="/auth/logout" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a>
-  </div>
-
-  <!-- Stats cards -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="bg-white rounded-3 shadow-sm p-4 d-flex align-items-center gap-3">
-        <div class="fs-1 text-primary"><i class="bi bi-box-seam"></i></div>
-        <div>
-          <div class="fs-2 fw-bold"><%= totalProducts %></div>
-          <div class="text-muted">Tổng sản phẩm</div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 text-center p-5 shadow-sm">
+                        <i class="bi bi-box-seam fs-1 text-primary mb-3"></i>
+                        <h3 class="fw-bold text-primary">${totalProducts || 0}</h3>
+                        <p class="text-muted">Tổng sản phẩm</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 text-center p-5 shadow-sm">
+                        <i class="bi bi-bag-check fs-1 text-success mb-3"></i>
+                        <h3 class="fw-bold text-success">${totalOrders || 0}</h3>
+                        <p class="text-muted">Tổng đơn hàng</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 text-center p-5 shadow-sm">
+                        <i class="bi bi-clock-history fs-1 text-warning mb-3"></i>
+                        <h3 class="fw-bold text-warning">${pendingOrders || 0}</h3>
+                        <p class="text-muted">Đơn chờ xử lý</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="bg-white rounded-3 shadow-sm p-4 d-flex align-items-center gap-3">
-        <div class="fs-1 text-success"><i class="bi bi-bag-check"></i></div>
-        <div>
-          <div class="fs-2 fw-bold"><%= totalOrders %></div>
-          <div class="text-muted">Tổng đơn hàng</div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="bg-white rounded-3 shadow-sm p-4 d-flex align-items-center gap-3">
-        <div class="fs-1 text-warning"><i class="bi bi-clock-history"></i></div>
-        <div>
-          <div class="fs-2 fw-bold"><%= pendingOrders %></div>
-          <div class="text-muted">Đơn chờ xử lý</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick links -->
-  <div class="row g-3">
-    <div class="col-md-4">
-      <a href="/admin/products/add" class="btn btn-primary w-100 py-3">
-        <i class="bi bi-plus-circle fs-4 d-block mb-1"></i>Thêm sản phẩm mới
-      </a>
-    </div>
-    <div class="col-md-4">
-      <a href="/admin/orders" class="btn btn-warning w-100 py-3">
-        <i class="bi bi-list-check fs-4 d-block mb-1"></i>Xem đơn hàng
-      </a>
-    </div>
-    <div class="col-md-4">
-      <a href="/admin/statistics" class="btn btn-info w-100 py-3 text-white">
-        <i class="bi bi-graph-up fs-4 d-block mb-1"></i>Xem thống kê
-      </a>
-    </div>
-  </div>
-</div>
-<%- include('../partials/footer') %>
+    `
+}) %>

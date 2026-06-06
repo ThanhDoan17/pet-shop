@@ -41,7 +41,6 @@ exports.updateOrderStatusByStaff = async (req, res) => {
 
     // 5. Nếu trạng thái chuyển sang "delivered", kích hoạt hàm sinh thông báo tự động của bạn
     if (status === 'delivered') {
-      // Hàm tạo thông báo cũ của bạn yêu cầu: userId, orderId, orderCode (sử dụng tạm _id làm mã đơn nếu không có trường mã riêng)
       const orderCode = order.orderCode || order._id.toString().slice(-6).toUpperCase(); 
       await exports.createDeliveredNotification(order.user, order._id, orderCode);
     }
@@ -125,5 +124,45 @@ exports.createReplyNotification = async (userId, productName, productId) => {
     });
   } catch (err) {
     console.error('Error creating reply notification:', err);
+  }
+}; // <--- ĐÃ SỬA: Đóng ngoặc nhọn chuẩn xác cho hàm createReplyNotification tại đây
+
+// ==========================================
+// CHỨC NĂNG KHÁCH HÀNG TỰ HỦY ĐƠN HÀNG KHI CHỜ XỬ LÝ (PENDING)
+// ==========================================
+exports.customerCancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const customerId = req.session.user.id; 
+
+    // Tìm kiếm đơn hàng khớp mã và đúng của khách hàng hiện tại
+    const order = await Order.findOne({ _id: orderId, user: customerId });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Không tìm thấy đơn hàng hoặc đơn hàng không thuộc về bạn." });
+    }
+
+    // Ràng buộc nghiệp vụ trạng thái
+    if (order.status !== 'pending') {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Không thể hủy đơn hàng! Đơn hàng đã được xử lý hoặc vận chuyển." 
+      });
+    }
+
+    // Đổi trạng thái sang hủy đơn
+    order.status = 'cancelled';
+    order.statusHistory.push({
+      status: 'cancelled',
+      updatedBy: customerId,
+      roleAtTime: 'user', 
+      updatedAt: new Date()
+    });
+
+    await order.save();
+    return res.status(200).json({ success: true, message: "Bạn đã hủy đơn hàng thành công." });
+
+  } catch (err) {
+    console.error("Lỗi khi khách hàng hủy đơn:", err);
+    return res.status(500).json({ success: false, message: "Có lỗi xảy ra trong quá trình hủy đơn." });
   }
 };

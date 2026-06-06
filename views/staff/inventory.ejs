@@ -1,72 +1,174 @@
-<%- include('../partials/header') %>
-<div class="container py-4">
-  <h2 class="section-title"><i class="bi bi-boxes"></i> Quản lý tồn kho</h2>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý tồn kho - PESTshop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/css/dashboard.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+<div class="dashboard-wrapper">
 
-  <div class="mb-3">
-    <a href="/staff/orders" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bag"></i> Đơn hàng</a>
-    <a href="/staff/products/add" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</a>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-water"></i>
+      <span>PEST<strong>shop</strong></span>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%= user ? user.name.charAt(0).toUpperCase() : 'S' %></div>
+      <div>
+        <div class="sidebar-username">Chào, <%= user ? user.name : '' %></div>
+        <div class="sidebar-role"><span class="role-badge role-staff">Nhân viên</span></div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" onclick="loadPage('inventory',this)" title="Tồn kho">
+        <i class="bi bi-boxes"></i><span>Tồn kho</span>
+      </a>
+      <a href="#" class="nav-item" onclick="loadPage('orders',this)" title="Đơn hàng">
+        <i class="bi bi-bag-check"></i><span>Đơn hàng</span>
+      </a>
+      <a href="#" class="nav-item" onclick="loadPage('add-product',this)" title="Thêm sản phẩm">
+        <i class="bi bi-plus-circle"></i><span>Thêm sản phẩm</span>
+      </a>
+      <div class="sidebar-divider"></div>
+      <a href="/auth/change-password" class="nav-item" title="Đổi mật khẩu">
+        <i class="bi bi-key"></i><span>Đổi mật khẩu</span>
+      </a>
+      <a href="/auth/logout" class="nav-item nav-item--logout" title="Đăng xuất">
+        <i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span>
+      </a>
+    </nav>
+  </aside>
 
-  <form method="GET" action="/staff/inventory" class="mb-3">
-  <div class="row g-2" style="max-width:650px">
-    <div class="col">
-      <input type="text" name="search" value="<%= search %>" class="form-control" placeholder="🔍 Tìm sản phẩm...">
-    </div>
-    <div class="col-auto">
-      <select name="sort" class="form-select">
-        <option value="" <%= sort === '' ? 'selected' : '' %>>Mặc định</option>
-        <option value="stock-asc" <%= sort === 'stock-asc' ? 'selected' : '' %>>Tồn kho tăng dần</option>
-        <option value="stock-desc" <%= sort === 'stock-desc' ? 'selected' : '' %>>Tồn kho giảm dần</option>
-        <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Tên A-Z</option>
-      </select>
-    </div>
-    <div class="col-auto">
-      <button class="btn btn-primary">Tìm</button>
-      <% if (search || sort) { %><a href="/staff/inventory" class="btn btn-outline-secondary">Xóa</a><% } %>
-    </div>
-  </div>
-</form>
+  <!-- MAIN -->
+  <div class="dashboard-main">
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <div class="header-title">
+          <h1 id="pageTitle">Quản lý tồn kho</h1>
+          <p id="pageSubtitle">Cập nhật số lượng sản phẩm trong kho</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="header-time" id="header-time"></span>
+      </div>
+    </header>
 
-  <div class="bg-white rounded-3 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-dark">
-          <tr>
-            <th>Ảnh</th>
-            <th>Tên sản phẩm</th>
-            <th>Danh mục</th>
-            <th>Tồn kho</th>
-            <th>Cập nhật tồn kho</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% products.forEach(p => { %>
-          <tr>
-            <td><img src="<%= p.image %>" width="50" height="50" style="object-fit:contain;" class="rounded"></td>
-            <td class="fw-bold"><%= p.name %></td>
-            <td><span class="badge bg-secondary"><%= p.category %></span></td>
-            <td>
-              <span class="badge <%= p.stock > 10 ? 'bg-success' : p.stock > 0 ? 'bg-warning text-dark' : 'bg-danger' %> fs-6"><%= p.stock %></span>
-              <% if (p.stock === 0) { %><small class="text-danger ms-1">Hết hàng!</small><% } %>
-              <% if (p.stock > 0 && p.stock <= 5) { %><small class="text-warning ms-1">Sắp hết!</small><% } %>
-            </td>
-            <td>
-              <form method="POST" action="/staff/inventory/<%= p._id %>/stock" class="d-flex gap-2">
-                <input type="number" name="stock" value="<%= p.stock %>" min="0" class="form-control form-control-sm" style="width:80px">
-                <button class="btn btn-sm btn-primary">Lưu</button>
-              </form>
-            </td>
-            <td>
-              <a href="/staff/products/edit/<%= p._id %>" class="btn btn-sm btn-outline-primary">
-                <i class="bi bi-pencil"></i> Sửa
-              </a>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+    <main class="dashboard-content">
+      <div id="content-dashboard" style="display:none"></div>
+      <div id="content-ajax">
+
+        <!-- Toolbar -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <form method="GET" action="/staff/inventory" class="d-flex gap-2 flex-wrap">
+            <input type="text" name="search" value="<%= search %>" class="form-control form-control-sm" style="width:220px" placeholder="🔍 Tìm sản phẩm...">
+            <select name="sort" class="form-select form-select-sm" style="width:180px">
+              <option value="" <%= sort==='' ? 'selected':'' %>>Mặc định</option>
+              <option value="stock-asc" <%= sort==='stock-asc' ? 'selected':'' %>>Tồn kho tăng dần</option>
+              <option value="stock-desc" <%= sort==='stock-desc' ? 'selected':'' %>>Tồn kho giảm dần</option>
+              <option value="name" <%= sort==='name' ? 'selected':'' %>>Tên A-Z</option>
+            </select>
+            <button class="dash-btn dash-btn--primary dash-btn--sm">Tìm</button>
+            <% if (search || sort) { %><a href="/staff/inventory" class="dash-btn dash-btn--outline dash-btn--sm">Xóa</a><% } %>
+          </form>
+          <a href="/staff/products/add" class="dash-btn dash-btn--primary dash-btn--sm">
+            <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+          </a>
+        </div>
+
+        <!-- Table -->
+        <div class="dash-card" style="padding:0;overflow:hidden">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Tồn kho</th>
+                <th>Cập nhật số lượng</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% products.forEach(p => { %>
+              <tr>
+                <td><img src="<%= p.image %>" width="44" height="44" style="object-fit:contain;border-radius:8px;background:#f8f9fa;padding:3px"></td>
+                <td class="fw-600" style="max-width:220px"><%= p.name %></td>
+                <td>
+                  <span class="dash-badge dash-badge--gray">
+                    <%= p.category === 'tank' ? '🏘️ Bể & Lồng' : p.category === 'food' ? '🌿 Thức ăn' : p.category === 'accessory' ? '🎯 Phụ kiện' : p.category === 'reptile' ? '🦎 Bò sát' : p.category === 'hamster' ? '🐹 Hamster' : p.category === 'medicine' ? '💊 Thuốc' : p.category === 'clothing' ? '👗 Quần áo' : '🐠 Cá' %>
+                  </span>
+                </td>
+                <td>
+                  <span class="dash-badge <%= p.stock > 10 ? 'dash-badge--green' : p.stock > 0 ? 'dash-badge--orange' : 'dash-badge--red' %>">
+                    <%= p.stock %> sp
+                  </span>
+                  <% if (p.stock === 0) { %><small class="text-danger ms-1">Hết!</small><% } %>
+                  <% if (p.stock > 0 && p.stock <= 5) { %><small class="text-warning ms-1">Sắp hết!</small><% } %>
+                </td>
+                <td>
+                  <form method="POST" action="/staff/inventory/<%= p._id %>/stock" class="d-flex gap-2">
+                    <input type="number" name="stock" value="<%= p.stock %>" min="0" class="form-control form-control-sm" style="width:75px">
+                    <button class="dash-btn dash-btn--primary dash-btn--sm">Lưu</button>
+                  </form>
+                </td>
+                <td>
+                  <a href="/staff/products/edit/<%= p._id %>" class="dash-btn dash-btn--outline dash-btn--sm">
+                    <i class="bi bi-pencil"></i> Sửa
+                  </a>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
   </div>
 </div>
-<%- include('../partials/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+function updateTime() {
+  const el = document.getElementById('header-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateTime,1000); updateTime();
+
+const ajaxPages = {
+  inventory: '/staff/inventory',
+  orders: '/staff/orders',
+  'add-product': '/staff/products/add'
+};
+const pageTitles = {
+  inventory: { title: 'Quản lý tồn kho', sub: 'Cập nhật số lượng sản phẩm' },
+  orders: { title: 'Quản lý đơn hàng', sub: 'Xem và cập nhật trạng thái đơn' },
+  'add-product': { title: 'Thêm sản phẩm', sub: 'Thêm sản phẩm mới vào kho' }
+};
+
+async function loadPage(page, linkEl) {
+  document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+  if (linkEl) linkEl.classList.add('active');
+
+  const info = pageTitles[page] || { title: page, sub: '' };
+  document.getElementById('pageTitle').textContent = info.title;
+  document.getElementById('pageSubtitle').textContent = info.sub;
+
+  if (page === 'inventory') {
+    window.location.href = '/staff/inventory';
+    return;
+  }
+  window.location.href = ajaxPages[page];
+}
+</script>
+</body>
+</html>

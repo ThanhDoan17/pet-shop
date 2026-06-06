@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'PESTshop Admin' %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/css/dashboard.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+
+<div class="dashboard-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="bi bi-water"></i>
+      <span>PEST<strong>shop</strong></span>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">
+        <%= user && user.name ? user.name.charAt(0).toUpperCase() : 'A' %>
+      </div>
+      <div>
+        <div class="sidebar-username">Chào, <%= user ? user.name : 'Admin' %></div>
+        <div class="sidebar-role">
+          <% if (user && user.role === 'admin') { %>
+            <span class="role-badge role-admin">Admin</span>
+          <% } else { %>
+            <span class="role-badge role-staff">Nhân viên</span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <% if (user && user.role === 'admin') { %>
+        <a href="/admin/products" class="nav-item <%= currentPage === 'products' ? 'active' : '' %>">
+          <i class="bi bi-box-seam"></i><span>Danh sách sản phẩm</span>
+        </a>
+        <a href="/admin/products/add" class="nav-item <%= currentPage === 'product-form' ? 'active' : '' %>">
+          <i class="bi bi-plus-circle"></i><span>Thêm sản phẩm</span>
+        </a>
+        <a href="/admin/orders" class="nav-item <%= currentPage === 'orders' ? 'active' : '' %>">
+          <i class="bi bi-bag-check"></i><span>Đơn hàng</span>
+        </a>
+        <a href="/admin/users" class="nav-item <%= currentPage === 'users' ? 'active' : '' %>">
+          <i class="bi bi-people"></i><span>Người dùng</span>
+        </a>
+        <a href="/admin/reviews" class="nav-item <%= currentPage === 'reviews' ? 'active' : '' %>">
+          <i class="bi bi-chat-square-text"></i><span>Phản hồi</span>
+        </a>
+        <a href="/admin/statistics" class="nav-item <%= currentPage === 'statistics' ? 'active' : '' %>">
+          <i class="bi bi-bar-chart-line"></i><span>Thống kê</span>
+        </a>
+      <% } else { %>
+        <a href="/staff/inventory" class="nav-item <%= currentPage === 'inventory' ? 'active' : '' %>">
+          <i class="bi bi-boxes"></i><span>Tồn kho</span>
+        </a>
+        <a href="/staff/orders" class="nav-item <%= currentPage === 'orders' ? 'active' : '' %>">
+          <i class="bi bi-bag-check"></i><span>Đơn hàng</span>
+        </a>
+        <a href="/staff/products/add" class="nav-item <%= currentPage === 'add-product' ? 'active' : '' %>">
+          <i class="bi bi-plus-circle"></i><span>Thêm sản phẩm</span>
+        </a>
+      <% } %>
+
+      <div class="sidebar-divider"></div>
+      <a href="/auth/change-password" class="nav-item <%= currentPage === 'password' ? 'active' : '' %>">
+        <i class="bi bi-key"></i><span>Đổi mật khẩu</span>
+      </a>
+      <a href="/auth/logout" class="nav-item nav-item--logout">
+        <i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="dashboard-main">
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="header-title">
+          <h1><%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title : 'Trang quản trị') %></h1>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="header-time" id="header-time"></span>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+  <%- body != null ? body : '' %>
+</main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+function updateTime() {
+  const el = document.getElementById('header-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateTime, 1000); updateTime();
+</script>
+</body>
+</html>
