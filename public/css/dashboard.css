@@ -1,7 +1,4 @@
-/* =============================================
-   PESTSHOP DASHBOARD CSS
-   ============================================= */
-
+/* ============================================= */
 :root {
   --sidebar-w: 260px;
   --sidebar-collapsed-w: 70px;
@@ -228,24 +225,23 @@ body.dashboard-body {
 .btn-header:hover { background: var(--primary); color: var(--white); }
 
 /* ===== CONTENT ===== */
-.dashboard-content { padding: 28px; flex: 1; }
+.dashboard-content {
+    padding: 20px 28px;          
+    flex: 1;
+    overflow-y: auto;
+    background: #f8f9fa;
+    min-height: calc(100vh - 64px);
+}
 
 /* ===== CARDS ===== */
-.dash-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 24px;
-  margin-bottom: 20px;
+.dash-card > .p-4 {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px !important;
+    margin: 0 !important;
 }
-.dash-card-title {
-  font-size: .75rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gray-4);
-  margin-bottom: 20px;
-}
+
 
 /* KPI cards */
 .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
@@ -390,4 +386,27 @@ body.dashboard-body {
   .kpi-row { grid-template-columns: 1fr; }
   .quick-actions { grid-template-columns: 1fr; }
   .dashboard-header { padding: 0 16px; }
+}
+
+.dashboard-main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: margin-left var(--transition);
+}
+
+.sidebar.collapsed ~ .dashboard-main {
+    margin-left: var(--sidebar-collapsed-w);
+}
+
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.dashboard-content {
+    flex: 1;
 }

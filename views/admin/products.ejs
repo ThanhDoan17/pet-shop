@@ -1,70 +1,117 @@
-<%- include('../partials/header') %>
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="section-title mb-0"><i class="bi bi-box-seam"></i> Quản lý sản phẩm</h2>
-  </div>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý sản phẩm - PESTshop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/css/dashboard.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+<div class="dashboard-wrapper">
 
-  <div class="mb-3">
-    <a href="/admin" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-speedometer2"></i> Dashboard</a>
-    <a href="/admin/orders" class="btn btn-outline-secondary btn-sm me-2"><i class="bi bi-bag"></i> Đơn hàng</a>
-    <a href="/admin/statistics" class="btn btn-outline-secondary btn-sm"><i class="bi bi-bar-chart"></i> Thống kê</a>
-  </div>
-
-  <form method="GET" action="/admin/products" class="mb-3">
-  <div class="input-group" style="max-width:400px">
-    <input type="text" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" class="form-control" placeholder="🔍 Tìm sản phẩm...">
-    <button class="btn btn-primary">Tìm</button>
-    <% if (typeof search !== 'undefined' && search) { %><a href="/admin/products" class="btn btn-outline-secondary">Xóa</a><% } %>
-  </div>
-</form>
-
-  <div class="bg-white rounded-3 shadow-sm">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-dark">
-          <tr>
-            <th>Ảnh</th>
-            <th>Tên sản phẩm</th>
-            <th>Giá</th>
-            <th>Danh mục</th>
-            <th>Tồn kho</th>
-            <th class="text-center">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% products.forEach(p => { %>
-          <tr>
-            <td><img src="<%= p.image %>" width="60" height="60" style="object-fit:contain;" class="rounded"></td>
-            <td>
-              <div class="fw-600"><%= p.name %></div>
-              <small class="text-muted"><%= p.description ? p.description.substring(0,50) + '...' : '' %></small>
-            </td>
-            <td class="fw-bold text-warning"><%= p.price.toLocaleString('vi-VN') %> đ</td>
-            <td>
-              <span class="badge bg-secondary">
-                <%= p.category === 'tank' ? '🏘️ Bể & Lồng' : p.category === 'food' ? '🌿 Thức ăn' : p.category === 'accessory' ? '🎯 Phụ kiện' : p.category === 'reptile' ? '🦎 Bò sát' : p.category === 'hamster' ? '🐹 Hamster' : p.category === 'medicine' ? '💊 Thuốc' : p.category === 'clothing' ? '👗 Quần áo' : '🐠 Cá' %>
-              </span>
-            </td>
-            <td>
-              <span class="badge <%= p.stock > 10 ? 'bg-success' : p.stock > 0 ? 'bg-warning text-dark' : 'bg-danger' %>">
-                <%= p.stock %> sản phẩm
-              </span>
-            </td>
-            <td class="text-center">
-              <a href="/admin/products/edit/<%= p._id %>" class="btn btn-sm btn-outline-primary me-1">
-                <i class="bi bi-pencil"></i> Sửa
-              </a>
-              <form method="POST" action="/admin/products/delete/<%= p._id %>" style="display:inline">
-                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm này?')">
-                  <i class="bi bi-trash"></i> Xóa
-                </button>
-              </form>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><i class="bi bi-water"></i><span>PEST<strong>shop</strong></span></div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><%= user ? user.name.charAt(0).toUpperCase() : 'A' %></div>
+      <div>
+        <div class="sidebar-username">Chào, <%= user ? user.name : '' %></div>
+        <div class="sidebar-role"><span class="role-badge role-admin">Admin</span></div>
+      </div>
     </div>
+    <nav class="sidebar-nav">
+      <a href="/admin" class="nav-item" title="Trang chủ"><i class="bi bi-speedometer2"></i><span>Trang chủ</span></a>
+      <a href="/admin/products" class="nav-item active" title="Sản phẩm"><i class="bi bi-box-seam"></i><span>Sản phẩm</span></a>
+      <a href="/admin/orders" class="nav-item" title="Đơn hàng"><i class="bi bi-bag-check"></i><span>Đơn hàng</span></a>
+      <a href="/admin/users" class="nav-item" title="Người dùng"><i class="bi bi-people"></i><span>Người dùng</span></a>
+      <a href="/admin/reviews" class="nav-item" title="Phản hồi"><i class="bi bi-chat-square-text"></i><span>Phản hồi</span></a>
+      <a href="/admin/statistics" class="nav-item" title="Thống kê"><i class="bi bi-bar-chart-line"></i><span>Thống kê</span></a>
+      <div class="sidebar-divider"></div>
+      <a href="/auth/logout" class="nav-item nav-item--logout" title="Đăng xuất"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></a>
+    </nav>
+  </aside>
+
+  <div class="dashboard-main">
+    <header class="dashboard-header">
+      <div class="header-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+        <div class="header-title"><h1>Quản lý sản phẩm</h1><p>Thêm, sửa, xóa sản phẩm</p></div>
+      </div>
+      <div class="header-right">
+        <span class="header-time" id="header-time"></span>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <form method="GET" action="/admin/products" class="d-flex gap-2">
+          <input type="text" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" class="form-control form-control-sm" style="width:240px" placeholder="🔍 Tìm sản phẩm...">
+          <button class="dash-btn dash-btn--primary dash-btn--sm">Tìm</button>
+          <% if (typeof search !== 'undefined' && search) { %><a href="/admin/products" class="dash-btn dash-btn--outline dash-btn--sm">Xóa</a><% } %>
+        </form>
+        <a href="/admin/products/add" class="dash-btn dash-btn--primary"><i class="bi bi-plus-circle"></i> Thêm sản phẩm</a>
+      </div>
+
+      <div class="dash-card" style="padding:0;overflow:hidden">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Giá</th>
+              <th>Danh mục</th>
+              <th>Tồn kho</th>
+              <th class="text-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(p => { %>
+            <tr>
+              <td><img src="<%= p.image %>" width="44" height="44" style="object-fit:contain;border-radius:8px;background:#f8f9fa;padding:3px"></td>
+              <td>
+                <div class="fw-600" style="font-size:.88rem;max-width:200px"><%= p.name %></div>
+                <small class="text-muted"><%= p.description ? p.description.substring(0,40)+'...' : '' %></small>
+              </td>
+              <td class="fw-bold" style="color:var(--accent)"><%= p.price.toLocaleString('vi-VN') %> đ</td>
+              <td>
+                <span class="dash-badge dash-badge--gray">
+                  <%= p.category==='tank' ? '🏘️ Bể & Lồng' : p.category==='food' ? '🌿 Thức ăn' : p.category==='accessory' ? '🎯 Phụ kiện' : p.category==='reptile' ? '🦎 Bò sát' : p.category==='hamster' ? '🐹 Hamster' : p.category==='medicine' ? '💊 Thuốc' : p.category==='clothing' ? '👗 Quần áo' : '🐠 Cá' %>
+                </span>
+              </td>
+              <td>
+                <span class="dash-badge <%= p.stock > 10 ? 'dash-badge--green' : p.stock > 0 ? 'dash-badge--orange' : 'dash-badge--red' %>">
+                  <%= p.stock %> sp
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="d-flex gap-2 justify-content-center">
+                  <a href="/admin/products/edit/<%= p._id %>" class="dash-btn dash-btn--outline dash-btn--sm">
+                    <i class="bi bi-pencil"></i> Sửa
+                  </a>
+                  <form method="POST" action="/admin/products/delete/<%= p._id %>">
+                    <button class="dash-btn dash-btn--danger dash-btn--sm" onclick="return confirm('Xóa sản phẩm này?')">
+                      <i class="bi bi-trash"></i> Xóa
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
   </div>
 </div>
-<%- include('../partials/footer') %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+function updateTime() {
+  const el = document.getElementById('header-time');
+  if (el) el.textContent = new Date().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateTime,1000); updateTime();
+</script>
+</body>
+</html>

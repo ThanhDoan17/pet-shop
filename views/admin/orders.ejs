@@ -3,49 +3,27 @@
     pageTitle: 'Quản lý Đơn hàng',
     currentPage: 'orders',
     user: user,
-    body: `
-    
-
-        <div class="dash-card" style="padding:0;overflow:hidden">
-            <table class="dash-table">
-                <thead>
-                    <tr>
-                        <th>Mã đơn</th>
-                        <th>Khách hàng</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Ngày đặt</th>
-                        <th>Cập nhật</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${orders.map(o => `
-                        <tr>
-                            <td><span class="dash-badge dash-badge--gray">#${o._id.toString().slice(-6).toUpperCase()}</span></td>
-                            <td><i class="bi bi-person me-1"></i>${o.user ? o.user.name : 'N/A'}</td>
-                            <td class="fw-bold" style="color:var(--accent)">${o.totalPrice ? o.totalPrice.toLocaleString('vi-VN') : '0'} đ</td>
-                            <td>
-                                <span class="dash-badge ${o.status==='delivered' ? 'dash-badge--green' : o.status==='cancelled' ? 'dash-badge--red' : o.status==='shipping' ? 'dash-badge--blue' : 'dash-badge--orange'}">
-                                    ${o.status==='pending' ? 'Chờ xử lý' : o.status==='confirmed' ? 'Đã xác nhận' : o.status==='shipping' ? 'Đang giao' : o.status==='delivered' ? 'Đã giao' : 'Đã hủy'}
-                                </span>
-                            </td>
-                            <td style="font-size:.82rem;color:var(--gray-4)">${o.createdAt.toLocaleDateString('vi-VN')}</td>
-                            <td>
-                                <form method="POST" action="/admin/orders/${o._id}/status" class="d-flex gap-2">
-                                    <select name="status" class="form-select form-select-sm" style="width:140px">
-                                        <option value="pending" ${o.status==='pending' ? 'selected' : ''}>Chờ xử lý</option>
-                                        <option value="confirmed" ${o.status==='confirmed' ? 'selected' : ''}>Đã xác nhận</option>
-                                        <option value="shipping" ${o.status==='shipping' ? 'selected' : ''}>Đang giao</option>
-                                        <option value="delivered" ${o.status==='delivered' ? 'selected' : ''}>Đã giao</option>
-                                        <option value="cancelled" ${o.status==='cancelled' ? 'selected' : ''}>Đã hủy</option>
-                                    </select>
-                                    <button class="dash-btn dash-btn--primary dash-btn--sm">Lưu</button>
-                                </form>
-                            </td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `
+    body: '<div class="dash-card" style="padding:0;overflow:hidden"><table class="dash-table"><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày đặt</th><th>Cập nhật</th></tr></thead><tbody>' + 
+          (orders && orders.length ? orders.map(o => `
+            <tr>
+                <td><span class="dash-badge dash-badge--gray">#${o._id.toString().slice(-6).toUpperCase()}</span></td>
+                <td><i class="bi bi-person me-1"></i>${o.user ? o.user.name : 'N/A'}</td>
+                <td class="fw-bold" style="color:var(--accent)">${o.totalPrice ? o.totalPrice.toLocaleString('vi-VN') : '0'} đ</td>
+                <td><span class="dash-badge ${o.status==='delivered' ? 'dash-badge--green' : o.status==='cancelled' ? 'dash-badge--red' : o.status==='shipping' ? 'dash-badge--blue' : o.status==='confirmed' ? 'dash-badge--blue' : 'dash-badge--orange'}">${o.status==='pending' ? 'Chờ xử lý' : o.status==='confirmed' ? 'Đã xác nhận' : o.status==='shipping' ? 'Đang giao' : o.status==='delivered' ? 'Đã giao' : 'Đã hủy'}</span></td>
+                <td style="font-size:.82rem;color:var(--gray-4)">${o.createdAt.toLocaleDateString('vi-VN')}</td>
+                <td>
+                    <form method="POST" action="/admin/orders/${o._id}/status" class="d-flex gap-2">
+                        <select name="status" class="form-select form-select-sm" style="width:140px">
+                            <option value="pending" ${o.status==='pending' ? 'selected' : ''}>Chờ xử lý</option>
+                            <option value="confirmed" ${o.status==='confirmed' ? 'selected' : ''}>Đã xác nhận</option>
+                            <option value="shipping" ${o.status==='shipping' ? 'selected' : ''}>Đang giao</option>
+                            <option value="delivered" ${o.status==='delivered' ? 'selected' : ''}>Đã giao</option>
+                            <option value="cancelled" ${o.status==='cancelled' ? 'selected' : ''}>Đã hủy</option>
+                        </select>
+                        <button class="dash-btn dash-btn--primary dash-btn--sm">Lưu</button>
+                    </form>
+                </td>
+            </tr>
+          `).join('') : '<tr><td colspan="6" class="text-center py-4">Chưa có đơn hàng nào</td></tr>') + 
+          '</tbody></table></div>'
 }) %>

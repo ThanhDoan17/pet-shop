@@ -3,7 +3,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { isAdmin } = require('../middleware/auth');
 
-const upload = require('../config/multer');   
+const upload = require('../config/multer');
 
 router.use(isAdmin);
 
@@ -11,11 +11,10 @@ router.get('/', adminController.dashboard);
 
 router.get('/products', adminController.getProducts);
 router.get('/products/add', adminController.getAddProduct);
-
-router.post('/products/add', upload.single('image'), adminController.postAddProduct);
+router.post('/products/add', adminController.postAddProduct);   
 
 router.get('/products/edit/:id', adminController.getEditProduct);
-router.post('/products/edit/:id', upload.single('image'), adminController.postEditProduct);
+router.post('/products/edit/:id', upload.single('image'), adminController.postEditProduct);  
 
 router.post('/products/delete/:id', adminController.deleteProduct);
 

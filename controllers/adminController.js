@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const User = require('../models/User');
 
-const upload = require('../config/multer');
+const upload = require('../config/multer.js');
 
 exports.dashboard = async (req, res) => {   
   try {
@@ -53,45 +53,59 @@ exports.getProducts = async (req, res) => {
 };
 
 exports.getAddProduct = (req, res) => {
-  const isStaffUser = req.session.user && req.session.user.role === 'staff';
-  const formAction = isStaffUser ? '/staff/products/add' : '/admin/products/add';
-res.render('admin/product-form', {
-  title: 'Thêm sản phẩm',
-  pageTitle: 'Thêm sản phẩm mới',
-  currentPage: 'add-product',
-  user: req.session.user,
-  product: null, error: null, formAction});
+  res.render('admin/product-form', {
+    title: 'Thêm Sản Phẩm Mới',
+    pageTitle: 'Thêm sản phẩm mới',
+    currentPage: 'product-form',  
+    user: req.session.user,
+    product: null,
+    error: null,
+    formAction: '/admin/products/add'
+  });
 };
 
 exports.postAddProduct = [
-  upload.single('image'),   // Middleware upload
+  (req, res, next) => {
+    const upload = require('../config/multer');
+    upload.single('image')(req, res, (err) => {
+      if (err) {
+        console.error('Upload error:', err.message);
+        return res.redirect('/admin/products/add?error=upload_failed');
+      }
+      next();
+    });
+  },
   async (req, res) => {
     try {
       const { name, description, price, category, stock } = req.body;
 
+      if (!name || !category) {
+        return res.redirect('/admin/products/add?error=missing_fields');
+      }
+
       let image = '/images/default.jpg';
       if (req.file) {
-        image = req.file.path;           // <-- Đây là URL từ Cloudinary
+        image = '/uploads/' + req.file.filename;
       }
 
       const product = new Product({
-        name,
-        description,
-        price: Number(price),
+        name: name.trim(),
+        description: description || '',
+        price: Number(price) || 0,
         category,
-        stock: Number(stock),
+        stock: Number(stock) || 0,
         image,
         isActive: true
       });
 
       await product.save();
 
-      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-      res.redirect(redirectTo);
+      const isStaff = req.session.user && req.session.user.role === 'staff';
+      res.redirect(isStaff ? '/staff/inventory' : '/admin/products');
+
     } catch (err) {
       console.error(err);
-      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-      res.redirect(redirectTo);
+      res.redirect('/admin/products/add?error=save_failed');
     }
   }
 ];
@@ -105,7 +119,7 @@ exports.getEditProduct = async (req, res) => {
 res.render('admin/product-form', {
   title: 'Sửa sản phẩm',
   pageTitle: 'Chỉnh sửa sản phẩm',
-  currentPage: 'products',
+  currentPage: 'product-form',
   user: req.session.user,
   product, error: null, formAction
 });  } catch (err) {
@@ -113,35 +127,52 @@ res.render('admin/product-form', {
   }
 };
 
-exports.postEditProduct = [
-  upload.single('image'),
-  async (req, res) => {
-    try {
-      const { name, description, price, category, stock } = req.body;
-      
-      const update = { 
-        name, 
-        description, 
-        price: Number(price), 
-        category, 
-        stock: Number(stock) 
-      };
+exports.postEditProduct = async (req, res) => {
+  try {
+    const { name, description, price, category, stock, image: imageUrl } = req.body;
 
-      if (req.file) {
-        update.image = req.file.path;     // <-- URL Cloudinary
-      }
+    const updateData = {};
 
-      await Product.findByIdAndUpdate(req.params.id, update);
+    if (name && name.trim() !== '') updateData.name = name.trim();
+    if (description !== undefined) updateData.description = description;
+    if (category && category !== '') updateData.category = category;
+    if (price && price !== '') updateData.price = Number(price);
+    if (stock && stock !== '') updateData.stock = Number(stock);
 
-      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-      res.redirect(redirectTo);
-    } catch (err) {
-      console.error(err);
-      const redirectTo = req.session.user.role === 'staff' ? '/staff/inventory' : '/admin/products';
-      res.redirect(redirectTo);
+    // Xử lý ảnh: ưu tiên file upload mới, sau đó mới dùng text field
+    if (req.file) {
+      updateData.image = '/uploads/' + req.file.filename;
+      console.log("📸 New image uploaded:", updateData.image);
+    } else if (imageUrl && imageUrl !== '') {
+      updateData.image = imageUrl;
     }
+
+    console.log("🔄 Raw body:", req.body);
+    console.log("🔄 File:", req.file ? req.file.filename : "No file");
+    console.log("🔄 Updating with data:", updateData);
+
+    if (Object.keys(updateData).length === 0) {
+      console.log("⚠️ No data to update");
+      return res.redirect('/admin/products');
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id, 
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    console.log("✅ Product updated successfully:", updatedProduct.name);
+
+    const isStaff = req.session.user && req.session.user.role === 'staff';
+    const redirectTo = isStaff ? '/staff/inventory' : '/admin/products';
+    res.redirect(redirectTo);
+
+  } catch (err) {
+    console.error("❌ Edit product error:", err);
+    res.redirect('/admin/products');
   }
-];
+};
 
 exports.deleteProduct = async (req, res) => {
   try {
@@ -154,27 +185,29 @@ exports.deleteProduct = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 });
-    
+    const orders = await Order.find()
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 });
+
+    // Sắp xếp theo trạng thái
     const statusOrder = { 'pending': 0, 'confirmed': 1, 'shipping': 2, 'delivered': 3, 'cancelled': 4 };
     orders.sort((a, b) => {
       if (statusOrder[a.status] !== statusOrder[b.status]) {
         return statusOrder[a.status] - statusOrder[b.status];
-      }s
+      }
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    const isStaffUser = req.session.user && req.session.user.role === 'staff';
-    const view = isStaffUser ? 'staff/orders' : 'admin/orders';
-    res.render(view, {
-  title: 'Quản lý đơn hàng',
-  pageTitle: 'Quản lý đơn hàng',
-  currentPage: 'orders',
-  user: req.session.user,
-  orders
-});
+    res.render('admin/orders', {
+      title: 'Quản lý Đơn hàng',
+      pageTitle: 'Quản lý Đơn hàng',
+      currentPage: 'orders',
+      user: req.session.user,
+      orders: orders   // ← Quan trọng nhất: Phải có dòng này
+    });
   } catch (err) {
-    res.redirect('/');
+    console.error(err);
+    res.redirect('/admin');
   }
 };
 
@@ -254,7 +287,12 @@ exports.getStatistics = async (req, res) => {
       { $limit: 5 }
     ]);
 
-    res.render('admin/statistics', {
+    const statusStats = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]);
+
+  res.render('admin/statistics', {
   title: 'Thống kê & Báo cáo',
   pageTitle: 'Thống kê & Báo cáo',
   currentPage: 'statistics',
@@ -262,7 +300,7 @@ exports.getStatistics = async (req, res) => {
   totalProducts, maxPrice, minPrice,
   avgPrice: Math.round(avgPrice),
   totalValue, totalOrders, revenue,
-  orderStats, topProducts,
+  orderStats, topProducts, statusStats,
   type, year: parseInt(year), month: parseInt(month), labelFormat
 });
   } catch (err) {
@@ -313,6 +351,14 @@ exports.getUsers = async (req, res) => {
 
 exports.updateUserRole = async (req, res) => {
   try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.redirect('/admin/users');
+
+    // Không cho thay đổi role của Admin chính
+    if (user.role === 'admin' && (user.email === 'admin@petshop.com' || user.email.includes('admin'))) {
+      return res.redirect('/admin/users');
+    }
+
     await User.findByIdAndUpdate(req.params.id, { role: req.body.role });
     res.redirect('/admin/users');
   } catch (err) {
@@ -322,6 +368,14 @@ exports.updateUserRole = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.redirect('/admin/users');
+
+    // Không cho xóa Admin chính
+    if (user.role === 'admin' && (user.email === 'admin@petshop.com' || user.email.includes('admin'))) {
+      return res.redirect('/admin/users');
+    }
+
     await User.findByIdAndDelete(req.params.id);
     res.redirect('/admin/users');
   } catch (err) {
@@ -329,7 +383,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Trang quản lý phản hồi đánh giá
 exports.getReviews = async (req, res) => {
   try {
     const Review = require('../models/Review');
@@ -355,7 +408,6 @@ exports.getReviews = async (req, res) => {
   }
 };
 
-// Xử lý phản hồi từ trang admin
 exports.postAdminReply = async (req, res) => {
   try {
     const Review = require('../models/Review');
@@ -376,7 +428,6 @@ exports.postAdminReply = async (req, res) => {
   }
 };
 
-// Xóa phản hồi từ trang admin
 exports.deleteAdminReply = async (req, res) => {
   try {
     const Review = require('../models/Review');

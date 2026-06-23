@@ -1,22 +1,48 @@
 <%- include('../partials/header') %>
-<div class="container">
-  <div class="auth-card">
-    <h1 class="text-center"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</h1>
-    <% if (error) { %>
-      <div class="alert alert-danger"><%= error %></div>
-    <% } %>
-    <form method="POST" action="/auth/login">
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input type="email" name="email" class="form-control" placeholder="Nhập email" required>
+
+<div class="auth-page">
+  <div class="auth-container">
+    <div class="auth-left">
+      <img src="/picture/login-bg.jpg" alt="PESTshop" class="auth-bg">
+      <div class="auth-overlay">
+        <div class="auth-brand">
+          <h2>PEST<strong>shop</strong></h2>
+          
+        </div>
       </div>
-      <div class="mb-4">
-        <label class="form-label">Mật khẩu</label>
-        <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-form-wrapper">
+        <h1 class="auth-title">Đăng nhập ngay nào</h1>
+        <p class="auth-subtitle">Chào mừng bạn trở lại!</p>
+
+        <% if (error) { %>
+          <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
+        <form method="POST" action="/auth/login">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control auth-input" placeholder="Nhập email" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" name="password" class="form-control auth-input" placeholder="Nhập mật khẩu" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100 auth-btn">
+            Đăng nhập ngay
+          </button>
+        </form>
+
+        <p class="text-center mt-4">
+          Chưa có tài khoản? 
+          <a href="/auth/register" class="auth-link">Đăng ký ngay</a>
+        </p>
       </div>
-      <button type="submit" class="btn btn-primary w-100 py-2">Đăng nhập</button>
-    </form>
-    <p class="text-center mt-3">Chưa có tài khoản? <a href="/auth/register">Đăng ký ngay</a></p>
+    </div>
   </div>
 </div>
+
 <%- include('../partials/footer') %>
